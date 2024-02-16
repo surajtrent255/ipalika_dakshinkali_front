@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="description" content="" />
+<meta name="author" content="" />
+<title>दक्षिणकाली नगरपालिका</title>
+<!-- fav icon -->
+<link rel="icon" th:href="@{/assets/images/favicon1.ico}"
+	href="assets/images/favicon1.ico" type="image/x-icon" />
+	<link th:href="@{/assets/plugins/vectormap/jquery-jvectormap-2.0.2.css}"
+		  href="assets/plugins/vectormap/jquery-jvectormap-2.0.2.css"
+		  rel="stylesheet" />
+<link th:href="@{/assets/plugins/simplebar/css/simplebar.css}"
+	href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+<link th:href="@{/assets/css/bootstrap.min.css}"
+	href="assets/css/bootstrap.min.css" rel="stylesheet" />
+<link th:href="@{/assets/css/animate.css}" href="assets/css/animate.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/icons.css}" href="assets/css/icons.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/sidebar-menu.css}"
+	href="assets/css/sidebar-menu.css" rel="stylesheet" />
+<link th:href="@{/assets/css/app-style.css}"
+	href="assets/css/app-style.css" rel="stylesheet" />
+<link th:href="@{/assets/css/leaflet.css}" rel="stylesheet" />
+<style type="text/css">
+#locationMap {
+	height: 50em;
+	width: 100%;
+}
+</style>
+</head>
+<body>
+	<div id="wrapper">
+		<!-- Side bar and header -->
+		<div sec:authorize="isAuthenticated()"
+			th:replace="~{fragments/private-sidebar :: private-sidebar}"></div>
+		<div sec:authorize="!isAuthenticated()"
+			th:replace="~{fragments/public-sidebar :: public-sidebar}"></div>
+		<header th:replace="~{fragments/header :: header}" class="header1">
+		</header>
+		<div class="clearfix"></div>
+		<div class="content-wrapper">
+			<a class="float text-center" id="goBackButton" style="z-index: 99;position: fixed;
+			width: 40px;
+			height: 40px;
+			background-color: #0C9;
+			color: #FFF;
+			border-radius: 50px;
+			text-align: center;
+			padding-top: 9px;
+			box-shadow: 2px 2px 3px #999;">
+				<i class="fa fa-arrow-left my-float "></i>
+			</a>
+			<div class="container-fluid" id="pjax-container">
+				<div class="row pt-2 pb-2">
+					<div class="col-sm-9">
+						<h4 class="page-title">नगरबासी बिवरण कम्प्युटर प्रणाली</h4>
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="javaScript:void();">Home</a></li>
+							<li class="breadcrumb-item active" aria-current="page">Favorite
+								Place Details</li>
+						</ol>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-12 col-lg-6">
+						<div class="card" style="height: 95%;">
+							<div class="card-body">
+								<table
+									th:if="${favouritePlaceInfo != null && #arrays.length(favouritePlaceInfo) > 0}"
+									class="table table-striped table-hover" id="grid">
+									<h4 th:text="${favouritePlaceInfo.placeName}"></h4>
+									<tr>
+										<th><strong>Name</strong></th>
+										<td th:text="${favouritePlaceInfo.placeName}"></td>
+									</tr>
+									<tr>
+										<th><strong>Ward</strong></th>
+										<td th:text="${favouritePlaceInfo.placeWard}"></td>
+									</tr>
+									<tr>
+										<th><strong>Description</strong></th>
+										<td th:text="${favouritePlaceInfo.placeDescription}"></td>
+									</tr>
+								</table>
+							</div>
+
+						</div>
+					</div>
+					<div class="col-12 col-lg-6">
+						<div class="card">
+							<div class="card-body">
+								<a th:href="${favouritePlaceInfo.placeImage}"
+									style="display: block" target="_blank" class="no-pjax"> <img
+									th:src="${favouritePlaceInfo.placeImage}" class="media-object"
+									style="width: 100%; height: 100%; object-fit: cover;"></a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12 col-lg-12">
+						<div id="locationMap"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a href="javaScript:void();" class="back-to-top"><i
+			class="fa fa-angle-double-up"></i> </a>
+		<!--Start footer-->
+		`
+		<footer th:replace="~{fragments/footer :: footer}"></footer>
+	</div>
+
+	<script th:src="@{/assets/js/leaflet.js}"> </script>
+	<script th:inline="javascript">
+			/*<![CDATA[*/
+			var geoCoordinates = /*[[${favouritePlaceInfo.placeGPS}]]*/ '0';
+			var placeType =  /*[[${favouritePlaceInfo.placeType}]]*/ '0';
+			var placeName = /*[[${favouritePlaceInfo.placeName}]]*/'';
+			var contextPath = /*[[${#request.contextPath}]]*/'';
+
+			/*]]>*/
+
+
+		// const button = document.getElementById('goBackButton');
+		// button.addEventListener('click', function(){
+		// 	url = contextPath + '/favourite-place';
+		// 	window.location.href = url;
+
+		// });
+		// let finalUrl = encodeURI(contextPath + "/favourite-place/pageLimit" + "?wardNo=" + wardNumber + "&pageSize=" + pageLimit + "&placeType=" + placeType + "&surveyor=" + surveyor + "&searchKey=" + searchKey + "&lastSeenId=" + firstItemId + appurl);
+		// gobackbuttonbegin
+
+		var getParams = function (url) {
+			var params = {};
+			var parser = document.createElement('a');
+			parser.href = url;
+			var query = parser.search.substring(1);
+			var vars = query.split('&');
+			for (var i = 0; i < vars.length; i++) {
+				var pair = vars[i].split('=');
+				params[pair[0]] = decodeURIComponent(pair[1]);
+			}
+			return params;
+		};
+		function onGoBackButtonClick(event){
+			//event.preventDefault();
+			//event.stopPropagation();
+			console.log("Yes Back!!")
+			
+			var urlObj = getParams(window.location.href);
+			
+			var url = '';
+			var urlObjParentHTML = urlObj.parentHTML;
+			
+			if(urlObj.parentHTML === 'favourite-place-data'){
+				 url = contextPath + "/favourite-place/forDetailGOBack?" ;
+				console.log("Need to go back to Resident data")
+			
+				
+				if(urlObj.searchKey){
+					url += "searchKey=" + urlObj.searchKey + "&";
+				}
+				if(urlObj.wardNo){
+					url += "wardNo=" + urlObj.wardNo + "&";
+				}
+				
+				if(urlObj.placeType){
+					url += "placeType=" + urlObj.placeType + "&";
+				}
+				if(urlObj.searchKey){
+					url += "searchKey=" + urlObj.searchKey + "&";
+				}
+				if(urlObj.surveyor){
+					url += "surveyor=" + urlObj.surveyor + "&";
+				}
+				if(urlObj.sortBy){
+					url += "sortBy=" + urlObj.sortBy + "&";
+					url += "sortByOrder=" + urlObj.sortByOrder + "&";
+				}
+				if(urlObj.currentPage)
+				url += "currentPage=" + urlObj.currentPage + "&";
+				
+				if(urlObj.pageSize)
+				url += "pageSize=" + urlObj.pageSize + "&";
+				
+				// for page retain
+				url += "lastSeenId="+urlObj.lastSeenId+"&";
+				url += "lastPageItemCount="+urlObj.lastPageItemCount+"&";
+				// end page retain
+				url += "backFrom=" + "favourite-place-details" + "&";
+				
+				
+				window.location.href = url;
+			}else if(urlObj.parentHTML === 'member-data'){
+				 url = contextPath + "/member?" ;
+				console.log("Need to go back to Member data")
+				
+				if(urlObj.prevLastItemId){
+					url += "prevLastItemId=" + urlObj.prevLastItemId + "&";
+				}
+			
+			if(urlObj.searchKey){
+				url += "searchKey=" + urlObj.searchKey + "&";
+			}
+			if(urlObj.wardNo){
+				url += "wardNo=" + urlObj.wardNo + "&";
+			}
+			
+			if(urlObj.sortBy){
+				url += "sortBy=" + urlObj.sortBy + "&";
+				url += "sortByOrder=" + urlObj.sortByOrder + "&";
+			}
+			if(urlObj.currentPage)
+			url += "currentPage=" + urlObj.currentPage + "&";
+			
+			if(urlObj.pageLimit)
+			url += "pageLimit=" + urlObj.pageLimit + "&";
+			
+			url += "backFrom=" + "res-details" + "&";
+			
+			
+			window.location.href = url;
+			}
+			
+		}
+
+		const button = document.getElementById('goBackButton');
+		button.addEventListener('click', function(event){
+			onGoBackButtonClick(event);
+		});
+		// gobackbuttonend
+
+			var placeIcon = L.Icon.extend({
+			    options: {
+			        shadowUrl: '/assets/images/markers/shadow.png',
+			        iconSize:     [38, 95],
+			        shadowSize:   [50, 64],
+			        iconAnchor:   [22, 94],
+			        shadowAnchor: [4, 62],
+			        popupAnchor:  [-3, -76]
+			    }
+			});
+			
+			var templeIcon = new placeIcon({iconUrl: '/assets/images/markers/temple.png'}),
+		    parkIcon = new placeIcon({iconUrl: '/assets/images/markers/park.png'}),
+		    pondIcon = new placeIcon({iconUrl: '/assets/images/markers/pond.png'}),
+		    wellIcon = new placeIcon({iconUrl: '/assets/images/markers/wells.png'}),
+		    statueIcon = new placeIcon({iconUrl: '/assets/images/markers/statue.png'}),
+		    schoolIcon = new placeIcon({iconUrl: '/assets/images/markers/school.png'}),
+		    organizationIcon = new placeIcon({iconUrl: '/assets/images/markers/organization.png'}),
+		    guthiIcon = new placeIcon({iconUrl: '/assets/images/markers/guthi.png'});
+
+			
+// 			Splitting the location coordinates into latitude and longitude
+			var geoFields = geoCoordinates.split(', ');
+			var geoLat = geoFields[0];		//Gets the latitude
+			var geoLong = geoFields[1];		//Gets the longitude
+			const mymap = L.map('locationMap').setView([geoLat, geoLong], 20);
+			var marker;
+// 			var layerGroup = L.layerGroup().addTo(mymap);
+			const attribution = '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors';
+			const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+			const tiles = L.tileLayer(tileUrl, {attribution});
+			tiles.addTo(mymap);
+// 			marker = L.marker([geoLat, geoLong]).addTo(mymap);		
+
+// 			var placeType  = placeType.toLowerCase();
+			switch(placeType) {
+				case "1":
+				L.marker([geoLat, geoLong], {icon: templeIcon}).addTo(mymap).bindPopup(placeName);;
+				break;
+				
+				case "2":
+				L.marker([geoLat, geoLong], {icon: parkIcon}).addTo(mymap).bindPopup(placeName);
+				break;
+				
+				case "3":
+				L.marker([geoLat, geoLong], {icon: pondIcon}).addTo(mymap).bindPopup(placeName);
+				break;
+				
+				case "4":
+				L.marker([geoLat, geoLong], {icon: wellIcon}).addTo(mymap).bindPopup(placeName);
+				break;
+
+				case "5":
+				L.marker([geoLat, geoLong], {icon: statueIcon}).addTo(mymap).bindPopup(placeName);
+				break;
+				
+				case "6":
+				L.marker([geoLat, geoLong], {icon: schoolIcon}).addTo(mymap).bindPopup(placeName);
+				break;
+				
+				case "7":
+				L.marker([geoLat, geoLong], {icon: organizationIcon}).addTo(mymap).bindPopup(placeName);
+				break;
+				
+				case "8":
+				L.marker([geoLat, geoLong], {icon: guthiIcon}).addTo(mymap).bindPopup(placeName);
+				break;
+				
+				case "9":
+				marker = L.marker([geoLat, geoLong]).addTo(mymap).bindPopup(placeName);		
+				break;
+				
+				default:
+				marker = L.marker([geoLat, geoLong]).addTo(mymap).bindPopup(placeName);		
+			}
+
+	</script>
+</body>
+</html>

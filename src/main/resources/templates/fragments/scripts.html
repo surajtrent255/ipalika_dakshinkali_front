@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+</head>
+<body>
+	<div th:fragment="scripts" class="scripts">
+		<!-- Bootstrap core JavaScript-->
+		<script th:src="@{/assets/js/jquery.min.js}"
+			src="assets/js/jquery.min.js"></script>
+		<!-- <script th:src="@{/assets/js/popper.min.js}"
+				src="assets/js/popper.min.js"></script> -->
+		<!-- <script th:src="@{/assets/js/bootstrap.min.js}"
+				src="assets/js/bootstrap.min.js"></script> -->
+		<script th:src="@{/assets/js/bootstrap2.min.js}"
+			src="assets/js/bootstrap2.min.js"></script>
+
+		<!-- simple bar js -->
+		<script th:src="@{/assets/plugins/simplebar/js/simplebar.js}"
+			src="assets/plugins/simplebar/js/simplebar.js"></script>
+		<!-- side bar-menu js -->
+		<script th:src="@{/assets/js/sidebar-menu.js}"
+			src="assets/js/sidebar-menu.js"></script>
+		<script th:src="@{/assets/js/app-script.js}"
+			src="assets/js/app-script.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+		<script
+			th:src="@{/assets/plugins/jquery.steps/js/jquery.steps.min.js}"
+			src="assets/plugins/jquery.steps/js/jquery.steps.min.js"></script>
+		<script
+			th:src="@{/assets/plugins/jquery-validation/js/jquery.validate.min.js}"
+			src="assets/plugins/jquery-validation/js/jquery.validate.min.js"></script>
+		<script th:src="@{/assets/js/transliteration.js}"
+			src="assets/js/transliteration.js"></script>
+		<script th:inline="javascript">
+				var contextPath = /*[[${#request.contextPath}]]*/;
+				
+				document.getElementById("current-year").innerHTML = new Date().getFullYear();
+	</script>
+	</div>
+</body>
+</html>

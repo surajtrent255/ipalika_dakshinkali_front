@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="description" content="" />
+<meta name="author" content="" />
+</head>
+<body>
+	<!-- Start wrapper-->
+		<!-- Start side bar-wrapper -->
+		<div th:fragment="public-sidebar" id="sidebar-wrapper" class="bg-theme bg-theme2" data-simplebar=""
+			data-simplebar-auto-hide="true">
+			<div class="brand-logo">
+<!-- 				<a th:href="@{/}">  -->
+				<img
+					th:src="@{/assets/images/logo.png}" class="logo-icon"
+					alt="logo icon">
+<!-- 				</a> -->
+			</div>
+			<ul class="sidebar-menu do-nicescrol">
+				<li class="sidebar-header">MAIN NAVIGATION</li>
+				<li>
+					<a th:href="@{/login}" class="waves-effect">
+						<i class="zmdi zmdi-account"></i> <span>लग इन</span>
+					</a>
+				</li>
+				
+				<li>
+					<a th:href="@{/report}" class="waves-effect"> <i
+							class="zmdi zmdi-view-dashboard"></i> <span>ड्यासबोर्ड
+                            	</span>
+					</a>
+				</li>
+				<li>
+					<a th:href="@{/public/resident}" class="waves-effect">
+						<i class="zmdi zmdi-layers"></i> <span>डाटा</span>
+					</a>
+				</li>
+				<li>
+					<a th:href="@{/favourite-place}"
+						class="waves-effect"><i class="zmdi zmdi-map"></i> <span>मनपर्ने  स्थान</span>
+					</a>
+				</li>
+			</ul>
+		</div>
+		<!-- End side bar-wrapper -->
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="utf-8" />
+</head>
+<body>
+	<!-- Start wrapper-->
+		<!-- Start side bar-wrapper -->
+		<div th:fragment="private-sidebar" id="sidebar-wrapper" class="bg-theme bg-theme2" data-simplebar=""
+			data-simplebar-auto-hide="true">
+			<div class="brand-logo">
+<!-- 				<a th:href="@{/super-admin}">  -->
+				<img
+					th:src="@{/assets/images/logo.png}" class="logo-icon"
+					alt="logo icon">
+<!-- 				</a> -->
+			</div>
+			<div class="user-details">
+				<div class="media align-items-center user-pointer collapsed"
+					data-toggle="collapse" data-target="#user-dropdown">
+					<div class="media-body">
+						<h6 class="side-user-name" th:text="${#authentication.principal.fullName}"></h6>
+					</div>
+				</div>
+				<div id="user-dropdown" class="collapse">
+					<ul class="user-setting-menu">
+						<li><a th:href="@{/user/profile}"><i
+								class="icon-user"></i> My Profile</a></li>
+						<li><a th:href="@{/user/setting}"><i
+								class="icon-settings"></i> Setting</a></li>
+						<li><a th:href="@{/logout}"><i class="icon-power"></i>
+								Logout</a></li>
+					</ul>
+				</div>
+			</div>
+			<ul class="sidebar-menu do-nicescrol">
+				<li class="sidebar-header">MAIN NAVIGATION</li>
+				<li sec:authorize="hasAnyRole('SUPER_ADMIN', 'CENTRAL_ADMIN', 'WARD_ADMIN')">
+					<a th:href="@{/report}" class="waves-effect"> <i
+							class="zmdi zmdi-view-dashboard"></i> <span>ड्यासबोर्ड</span>
+					</a>
+				</li>
+				<li sec:authorize="hasAnyRole('SUPER_ADMIN', 'CENTRAL_ADMIN')">
+					<a th:href="@{/ward}"
+					class="waves-effect"> <i class="zmdi zmdi-format-list-numbered"></i> <span>वडा सूची</span>
+					</a>
+				</li>
+				<li sec:authorize="hasAnyRole('WARD_ADMIN')">
+					<a th:href="@{/ward/} + ${#authentication.principal.wardNo}"
+					class="waves-effect"> <i class="zmdi zmdi-file-text"></i> <span>Ward Details</span>
+					</a>
+				</li>
+				<li sec:authorize="hasAnyRole('SUPER_ADMIN', 'CENTRAL_ADMIN')">
+					<a th:href="@{/user/userList}"
+					class="waves-effect"> <i class="zmdi zmdi-assignment-account"></i> <span>प्रयोगकर्ता सूची</span>
+					</a>
+				</li>
+				<li sec:authorize="hasAnyRole('SUPER_ADMIN', 'CENTRAL_ADMIN')">
+					<a th:href="@{/user/add}"
+					class="waves-effect"> <i class="zmdi zmdi-account-add"></i> <span>प्रयोगकर्ता </span>
+					</a>
+				</li>
+				<li sec:authorize="hasAnyRole('CENTRAL_ADMIN', 'WARD_ADMIN', 'SURVEYOR')">
+					<a th:href="@{/resident}" class="waves-effect">
+						<i class="zmdi zmdi-layers"></i> <span>डाटा</span>
+					</a>
+				</li>
+				<li sec:authorize="hasAnyRole('CENTRAL_ADMIN', 'WARD_ADMIN')">
+					<a th:href="@{/member}" class="waves-effect">
+						<i class="zmdi zmdi-assignment"></i> <span>सदस्य डाटा</span>
+					</a>
+				</li>
+				<li sec:authorize="hasAnyRole('CENTRAL_ADMIN', 'WARD_ADMIN', 'SURVEYOR')">
+					<a th:href="@{/survey-answer/household}"
+					class="waves-effect"> <i class="zmdi zmdi-home"></i> <span>घर</span>
+					</a>
+				</li>
+				<li sec:authorize="hasAnyRole('CENTRAL_ADMIN', 'WARD_ADMIN', 'SURVEYOR')">
+					<a th:href="@{/favourite-place/add}"
+						class="waves-effect"> <i class="zmdi zmdi-gps-dot"></i> 
+						<span>स्थान </span>
+					</a>
+				</li>
+				<li sec:authorize="hasAnyRole('CENTRAL_ADMIN')">
+					<a th:href="@{/favourite-place}"
+						class="waves-effect"><i class="zmdi zmdi-map"></i> <span>मनपर्ने  स्थान</span>
+					</a>
+				</li>
+				<li sec:authorize="hasAnyRole('WARD_ADMIN')">
+					<a th:href="@{/favourite-place/ward_admin}"
+					   class="waves-effect"><i class="zmdi zmdi-map"></i> <span>मनपर्ने  स्थान</span>
+					</a>
+				</li>
+
+				<li sec:authorize="hasAnyRole('SURVEYOR')">
+					<a th:href="@{/favourite-place/surveyor}"
+						class="waves-effect"><i class="zmdi zmdi-map"></i> <span>मनपर्ने  स्थान</span>
+					</a>
+				</li>
+			</ul>
+		</div>
+		<!-- End side bar-wrapper -->
+</body>
+</html>

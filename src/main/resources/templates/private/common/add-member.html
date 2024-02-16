@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+<title>दक्षिणकाली नगरपालिका</title>
+<link rel="icon" th:href="@{/assets/images/favicon1.ico}"
+	href="assets/images/favicon1.ico" type="image/x-icon" />
+<link th:href="@{/assets/plugins/vectormap/jquery-jvectormap-2.0.2.css}"
+	href="assets/plugins/vectormap/jquery-jvectormap-2.0.2.css"
+	rel="stylesheet" />
+<link th:href="@{/assets/plugins/simplebar/css/simplebar.css}"
+	href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+<link th:href="@{/assets/css/bootstrap.min.css}"
+	href="assets/css/bootstrap.min.css" rel="stylesheet" />
+<link th:href="@{/assets/css/animate.css}" href="assets/css/animate.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/icons.css}" href="assets/css/icons.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/sidebar-menu.css}"
+	href="assets/css/sidebar-menu.css" rel="stylesheet" />
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/nepali-datepicker/nepaliDatePicker.min.css}"
+	href="assets/plugins/nepali-datepicker/nepaliDatePicker.min.css">
+<link th:href="@{/assets/css/app-style.css}"
+	href="assets/css/app-style.css" rel="stylesheet" />
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/datatable/datatables.min.css}"
+	href="assets/plugins/datatable/datatables.min.css">
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/jquery.steps/css/jquery.steps.css}"
+	href="assets/plugins/jquery.steps/css/jquery.steps.css">
+<style>
+.form-group {
+	width: 100%;
+}
+
+.wizard>.content {
+	background: #fff;
+	min-height: 430px;
+	margin: 0;
+}
+
+.wizard>.content>.body {
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.member-panel .padding, .member-panel-submit .padding {
+	padding: 10px;
+}
+
+.wizard>.content>.body label.error {
+	margin-left: 0;
+}
+
+.error_form {
+	top: 12px;
+	color: rgb(216, 15, 15);
+	font-size: 15px;
+	font-family: Helvetica;
+}
+</style>
+<script th:src="@{/assets/js/jquery.min.js}"
+	src="assets/js/jquery.min.js"></script>
+</head>
+<body>
+	<div id="wrapper">
+		<!--           	Sidebar and header -->
+		<div th:replace="~{fragments/private-sidebar :: private-sidebar}"></div>
+		<header th:replace="~{fragments/header}" class="header1"> </header>
+		<div class="clearfix"></div>
+		<div class="content-wrapper">
+			<div class="container-fluid" id="pjax-container">
+				<div class="row pt-2 pb-2">
+					<div class="col-sm-9">
+						<h4 class="page-title">Data Management System</h4>
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="javaScript:void();">Home</a></li>
+							<li class="breadcrumb-item active" aria-current="page">Add
+								Member</li>
+						</ol>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-body">
+						<div class="card-title">Fill up information about family
+							members.</div>
+<!-- 						<a href="javascript:void(0)" -->
+<!-- 							class="add-member btn btn-primary mb-2" style="margin-left: 8px;">Add -->
+<!-- 							Member</a> -->
+						<th:form:form method="POST" th:action="@{/resident}"
+							modelAttribute="member" enctype="multipart/form-data">
+							
+							<fieldset>
+								<div class="row member-panel" style="display: flex;">
+									<div class="col-lg-4 col-md-4 mb-2">
+										<div class="padding">
+											<label for="name"><h4>नाम थर :</h4></label> <input
+												type="text" id="name" name="name"
+												class="form-control required" value="">
+												<span class="error_form" id="name_error_message"></span>
+										</div>
+									</div>
+									<div class="col-lg-4 col-md-4 mb-2">
+										<div class="padding">
+											<label for="relation"><h4>नाता :</h4></label> <select
+												id="relation" name="relation" class="form-control required">
+												<option
+													th:each="relation, iteration : ${memberFormDetails.relation}"
+													th:value="${iteration.index + 1}" th:text="${relation}"></option>
+											</select>
+											<span class="error_form" id="relation_error_message"></span>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4 mb-2">
+										<div class="padding">
+											<label for="gender"><h4>लिङ्ग :</h4></label> <select
+												id="gender" name="gender" class="form-control required">
+												<option
+													th:each="gender, iteration : ${memberFormDetails.gender}"
+													th:value="${iteration.index + 1}" th:text="${gender}"></option>
+											</select>
+											<span class="error_form" id="gender_error_message"></span>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4 mb-2">
+										<div class="padding">
+											<label for="age"><h4>उमेर :</h4></label> <input type="text"
+												id="ageDisplay" name="ageDisplay" class="form-control age required"
+												value="" readonly>
+												<input type="hidden" name="age" id="age" value="">
+												<span class="error_form" id="age_error_message"></span>
+										</div>
+									</div>
+									<div class="col-lg-4 col-md-4 mb-2">
+										<div class="padding">
+											<label for="date_of_birth_BS"><h4>जन्म मिति</h4></label><br>
+												<label>B.S.</label> <input type="text"
+													id="date_of_birth_BS_devanagari" name="date_of_birth_BS_devanagari"
+													class="form-control required" value="" readonly
+													style="width: 50%;">
+												<input type="hidden" name="date_of_birth_BS" id="date_of_birth_BS" value="">	
+												<label>A.D.</label><input type="text"
+													id="date_of_birth_AD" name="date_of_birth_AD"
+													class="form-control required" value="" readonly
+													style="width: 50%;">
+												<span class="error_form" id="dateOfBirthBS_error_message"></span>
+										</div>
+									</div>
+
+									<div class="col-md-4 col-lg-4 mb-2">
+										<div class="padding">
+											<label><h4>वैवाहिक स्थिति :</h4></label> <select
+												name="marital_status" id="marital_status"
+												class="form-control required">
+												<option
+													th:each="maritalStatus, iteration : ${memberFormDetails.maritalStatus}"
+													th:value="${iteration.index + 1}"
+													th:text="${maritalStatus}"></option>
+											</select>
+											<span class="error_form" id="maritalStatus_error_message"></span>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4 mb-2">
+										<div class="padding">
+											<label for="education"><h4>शैक्षिक योग्यता</h4></label> <select
+												id="education" name="education"
+												class="form-control required">
+												<option
+													th:each="education, iteration : ${memberFormDetails.education}"
+													th:value="${iteration.index + 1}" th:text="${education}"></option>
+											</select>
+											<span class="error_form" id="education_error_message"></span>
+										</div>
+									</div>
+									
+									<div class="col-md-4 col-lg-4 mb-2">
+										<div class="padding">
+											<label><h4>कलेज/स्कूल</h4></label> <select
+												name="educational_institute" id="educational_institute"
+												class="form-control required">
+												<option
+													th:each="educationalInstitute, iteration : ${memberFormDetails.educationalInstitute}"
+													th:value="${iteration.index + 1}" th:text="${educationalInstitute}"></option>
+<!-- 												<option	value="सामूदायिक/सरकारी">सामूदायिक/सरकारी</option> -->
+<!-- 												<option	value="संस्थागत">संस्थागत</option> -->
+<!-- 												<option	value="निजी">निजी</option> -->
+<!-- 												<option	value="छैन">छैन</option> -->
+											</select>
+											<span class="error_form" id="educationalInstitute_error_message"></span>
+										</div>
+									</div>
+									
+									<div class="col-md-4 col-lg-4 mb-2">
+										<div class="padding">
+											<label for="occupation"><h4>पेशा :</h4></label> 
+											<select
+												name="occupation" id="occupation"
+												class="form-control required">
+												<option
+													th:each="occupation, iteration : ${memberFormDetails.occupation}"
+													th:value="${iteration.index + 1}" th:text="${occupation}"></option>
+<!-- 												<option	value="रोजगार (निजी/सरकारी)">रोजगार (निजी/सरकारी)</option> -->
+<!-- 												<option	value="व्यापार">व्यापार</option> -->
+<!-- 												<option	value="घरयासी">घरयासी</option> -->
+<!-- 												<option	value="कृषी">कृषी</option> -->
+<!-- 												<option	value="अध्ययन">अध्ययन</option> -->
+<!-- 												<option	value="वैदेशिक रोजगार">वैदेशिक रोजगार</option> -->
+<!-- 												<option	value="परामर्शकर्ता">परामर्शकर्ता</option> -->
+<!-- 												<option	value="छैन">छैन</option> -->
+											</select>
+											<span class="error_form" id="occupation_error_message"></span>
+										</div>
+									</div>
+									
+									<div class="col-md-4 col-lg-4 mb-2">
+										<div class="padding">
+											<label for="disability"><h4>अपाङ्गता :</h4></label> 
+											<select
+												name="disability" id="disability"
+												class="form-control required">
+												<option
+													th:each="differentlyAbled, iteration : ${memberFormDetails.differentlyAbled}"
+													th:value="${iteration.index + 1}" th:text="${differentlyAbled}"></option>
+<!-- 												<option	value="शारीरिक">शारीरिक</option> -->
+<!-- 												<option	value="दृष्टि सम्बन्धी">दृष्टि सम्बन्धी</option> -->
+<!-- 												<option	value="सुनाइ सम्बन्धी">सुनाइ सम्बन्धी</option> -->
+<!-- 												<option	value="स्वर/बोलाइ सम्बन्धी">स्वर/बोलाइ सम्बन्धी</option> -->
+<!-- 												<option	value="मानसिक">मानसिक</option> -->
+<!-- 												<option	value="बहुअपाङ्गता">बहुअपाङ्गता</option> -->
+<!-- 												<option	value="छैन">छैन</option> -->
+											</select>
+											<span class="error_form" id="disability_error_message"></span>
+										</div>
+									</div>
+									
+									<div class="col-md-4 col-lg-4 mb-2">
+										<div class="padding">
+											<label><h4>मतदाता परिचयपत्र :</h4></label> <select
+												class="form-control required" name="voter_card"
+												id="voter_card">
+												<option value="1">छ</option>
+												<option value="0">छैन</option>
+											</select>
+											<span class="error_form" id="voterCard_error_message"></span>
+										</div>
+									</div>
+									
+									<div class="col-md-4 col-lg-4 mb-2">
+										<div class="padding">
+											<label for="health"><h4>स्वास्थ्य अवस्था :</h4></label> 
+											
+											<select
+												name="health" id="health"
+												class="form-control required">
+												<option
+													th:each="healthStatus, iteration : ${memberFormDetails.healthStatus}"
+													th:value="${iteration.index + 1}" th:text="${healthStatus}"></option>
+<!-- 												<option	value="मुटु रोग">मुटु रोग</option> -->
+<!-- 												<option	value="दम/श्वासप्रश्वास">दम/श्वासप्रश्वास</option> -->
+<!-- 												<option	value="क्यान्सर">क्यान्सर</option> -->
+<!-- 												<option	value="मधुमेह (डायवेटिज)">मधुमेह (डायवेटिज)</option> -->
+<!-- 												<option	value="मृगौला/कलेजोको रोग">मृगौला/कलेजोको रोग</option> -->
+<!-- 												<option	value="स्त्री रोग">स्त्री रोग</option> -->
+<!-- 												<option	value="अल्सर/आन्द्राको रोग">अल्सर/आन्द्राको रोग</option> -->
+<!-- 												<option	value="उच्च/निम्न रक्तचाप">उच्च/निम्न रक्तचाप</option> -->
+<!-- 												<option	value="वाथ/इपिलेप्सी/पार्किन्सन">वाथ/इपिलेप्सी/पार्किन्सन</option> -->
+<!-- 												<option	value="सू/अल्काइमर्स">सू/अल्काइमर्स</option> -->
+<!-- 												<option	value="अन्य दीर्घरोग">अन्य दीर्घरोग</option> -->
+<!-- 												<option	value="सामान्य अवस्था">सामान्य अवस्था</option> -->
+											</select>
+											
+											<span class="error_form" id="health_error_message"></span>
+										</div>
+									</div>
+								</div>
+							</fieldset>
+							<button type="submit"
+								class="add-member btn btn-primary mb-2" style="margin-left: 8px;"
+								id="member-entry-submit">Add Member</button>
+								
+						</th:form:form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<footer th:replace="~{fragments/footer :: footer}"></footer>
+	</div>
+	<div th:replace="~{fragments/scripts :: scripts}">
+	</div>
+	<script
+		th:src="@{/assets/plugins/nepali-datepicker/nepaliDatePicker.min.js}"
+		src="assets/plugins/nepali-datepicker/jquery.nepaliDatePicker.min.js"></script>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var mainId = /*[[${residentFilledId}]]*/'0';
+		/*]]>*/
+
+		$(function() {
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$(document).ajaxSend(function(e, xhr, options) {
+				xhr.setRequestHeader(header, token);
+			});
+		});
+
+		google.load("elements", "1", {
+		    packages: "transliteration"
+		});
+
+		$(function() {
+		    var options = {
+			        sourceLanguage: 'en',
+			        destinationLanguage: ['ne'],
+			        shortcutKey: 'ctrl+g',
+			        transliterationEnabled: true
+			    };
+			var control =new google.elements.transliteration.TransliterationControl(options);
+			var uniElement = $(".unicode input[type='text'], #grid_filter input");
+			control.makeTransliteratable(uniElement);
+			control.makeTransliteratable(['name', 'occupation', 'health']);
+// 			control.showControl('translControl');
+		});
+
+		function goBack() {
+			window.history.back();
+		}
+		
+		//Gets the current date to set the max date in date picker
+		var currentDate = new Date();
+		var currentNepaliDate = calendarFunctions.getBsDateByAdDate(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate());
+		var formatedNepaliDate = calendarFunctions.bsDateFormat("%y-%m-%d", currentNepaliDate.bsYear, currentNepaliDate.bsMonth, currentNepaliDate.bsDate);
+		
+		var endDate = currentDate.getFullYear() + "-" + currentDate.getMonth() + 1 + "-" + currentDate.getDate();
+		
+		
+		$("#date_of_birth_BS_devanagari").nepaliDatePicker({
+			dateFormat: "%y-%m-%d",
+			maxDate: formatedNepaliDate,
+		    closeOnDateSelect: true   
+		})
+		
+		$("#date_of_birth_BS_devanagari").on("dateSelect", function (event) {
+			dateChangeManager();
+		});
+		
+		
+		//Handles the change in the text field when a date is selected or changed
+		function dateChangeManager(){
+			$("#date_of_birth_AD").val(endDate);
+			let dateSelectedAD = "";
+			let dateSelectedBS = "";
+			
+			let dateSelectedBSDevanagari = calendarFunctions.parseFormattedBsDate("%y-%m-%d", $("#date_of_birth_BS_devanagari").val());
+			let nepaliYear = dateSelectedBSDevanagari.bsYear;
+			let nepaliMonth = dateSelectedBSDevanagari.bsMonth;
+			let nepaliDay = dateSelectedBSDevanagari.bsDate;
+			
+			dateSelectedBS = [nepaliYear, nepaliMonth, nepaliDay].join('-');
+			
+			dateSelectedAD = calendarFunctions.getAdDateByBsDate(nepaliYear, nepaliMonth, nepaliDay);
+			
+			let formattedDateSelectedAD = formatDateAD(dateSelectedAD);
+			
+			$("#date_of_birth_AD").val(formattedDateSelectedAD);
+			$("#date_of_birth_BS").val(dateSelectedBS);
+			ageCalculator(formattedDateSelectedAD);
+		}
+		
+		//Calculates the age of the person based on the date of birth selected
+		function ageCalculator(dateOfBirthAD) {
+			var calculatedValue = "";
+			var displayYear = "";
+			
+			var end = Date.now();	//Getting the end full date, current date
+			var begin = Date.parse(dateOfBirthAD);	//Getting the beginning full date, date of Birth
+			var e = new Date(end);
+			var b = new Date(begin);
+			
+			var bYear = b.getFullYear();	//Getting the beginning year
+			var eYear = e.getFullYear();	//Getting the end year
+			var bMonth = b.getMonth();		//Getting the beginning month
+			var eMonth = e.getMonth();		//Getting the end month
+			var bDay = b.getDate();			//Getting the beginning day
+			var eDay = e.getDate();			//Getting the end day
+					
+
+			if ((eMonth == 0)||(eMonth == 2)||(eMonth == 4)|| (eMonth == 6) || (eMonth == 7) ||(eMonth == 9)||(eMonth == 11))
+				{
+					var eDays =  31;
+				}
+
+			if ((eMonth == 3)||(eMonth == 5)||(eMonth == 8)|| (eMonth == 10))
+				{
+					var eDays = 30;
+				}
+
+			if (eMonth == 1&&((eYear % 4 == 0) && (eYear % 100 != 0)) || (eYear % 400 == 0))
+				{
+					var eDays = 29;
+				}
+
+			if (eMonth == 1&&((eYear % 4 != 0) || (eYear % 100 == 0)))
+				{
+					var eDays = 28;
+				}
+
+			if ((bMonth == 0)||(bMonth == 2)||(bMonth == 4)|| (bMonth == 6) || (bMonth == 7) ||(bMonth == 9)||(bMonth == 11))
+				{
+					var bDays =  31;
+				}
+
+			if ((bMonth == 3)||(bMonth == 5)||(bMonth == 8)|| (bMonth == 10))
+				{
+					var bDays = 30;
+				}
+
+			if (bMonth == 1&&((bYear % 4 == 0) && (bYear % 100 != 0)) || (bYear % 400 == 0))
+				{
+					var bDays = 29;
+				}
+
+			if (bMonth == 1&&((bYear % 4 != 0) || (bYear % 100 == 0)))
+				{
+					var bDays = 28;
+				}
+
+			var FirstMonthDiff = bDays - bDay + 1;
+
+			if (eDay - bDay < 0)
+				{
+					eMonth = eMonth - 1;
+					eDay = eDay + eDays;
+				}
+	
+// 			if (eDay - bDay < 0) 
+// 				{ 
+// 					eMonth = eMonth - 1; 
+// 					eDay = eDay + bDays; 
+// 				}
+	
+			var daysDiff = eDay - bDay;
+			if(eMonth - bMonth < 0)
+				{
+					eYear = eYear - 1;
+					eMonth = eMonth + 12;
+				}
+
+			var monthDiff = eMonth - bMonth;
+
+			var yearDiff = eYear - bYear;
+
+			if (daysDiff == eDays)
+				{
+					daysDiff = 0;
+					monthDiff = monthDiff + 1;
+		
+					if (monthDiff == 12)
+					{
+						monthDiff = 0;
+						yearDiff = yearDiff + 1;
+					}
+	
+				}
+
+			if ((FirstMonthDiff != bDays)&&(eDay - 1 == eDays))
+				{
+					daysDiff = FirstMonthDiff;
+				}
+			
+			calculatedValue = yearDiff + " year(s)" + " " + monthDiff + " month(s) " + daysDiff + " days(s)";
+			displayYear = calendarFunctions.getNepaliNumber(yearDiff) + " बर्ष";
+			
+			$("#age").val(yearDiff);				//Sets the year as persons' age
+			$("#ageDisplay").val(displayYear);
+		}
+	
+		
+		//Function to parse English Date into yyyy-mm-dd format	
+		function formatDateAD(date) {
+		    let d = new Date(date),
+		        month = '' + (d.getMonth() + 1),
+		        day = '' + d.getDate(),
+		        year = d.getFullYear();
+
+		    if (month.length < 2) 
+		        month = '0' + month;
+		    if (day.length < 2) 
+		        day = '0' + day;
+
+		    return [year, month, day].join('-');
+		}
+		
+
+		//Form validation using jQuery//
+	 	$(function() {
+			
+			$("#name_error_message").hide();
+			$("#relation_error_message").hide();
+			$("#age_error_message").hide();
+			$("#gender_error_message").hide();
+			$("#dateOfBirthBS_error_message").hide();
+			$("#maritalStatus_error_message").hide();
+			$("#education_error_message").hide();
+			$("#occupation_error_message").hide();
+			$("#voterCard_error_message").hide();
+// 			$("#migration_error_message").hide();
+			$("#health_error_message").hide();
+			
+			let error_name = false;
+			let error_relation = false;
+			let error_age = false;
+			let error_gender = false;
+			let error_dateOfBirthBS = false;
+			let error_maritalStatus = false;
+			let error_education = false;
+			let error_occupation = false;
+			let error_voterCard = false;
+// 			let error_migration = false;
+			let error_health = false;
+			
+			
+			$("#name").focusout(function(){
+				check_name();
+			});
+			
+			$("#relation").focusout(function(){
+				check_relation();
+			});
+			
+			$("#age").focusout(function(){
+				check_age();
+			});
+			
+			$("#gender").focusout(function(){
+				check_gender();
+			});
+			
+			$("#date_of_birth_BS").focusout(function(){
+				check_dateOfBirthBS();
+			});
+			
+			$("#marital_status").focusout(function(){
+				check_maritalStatus();
+			});
+			
+			$("#education").focusout(function(){
+				check_education();
+			});
+			
+			$("#occupation").focusout(function(){
+				check_occupation();
+			});
+			
+			$("#voter_card").focusout(function(){
+				check_voterCard();
+			});
+			
+// 			$("#migration").focusout(function(){
+// 				check_migration();
+// 			});
+			
+			$("#health").focusout(function() {
+				check_health();
+			});
+			
+			
+			function check_name() {
+				let name = $("#name").val();
+				if(name !== '') {
+					$("#name_error_message").hide();
+					$("#name").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#name_error_message").html("Please enter the Family Member Name!");
+					$("#name_error_message").show();
+					$("#name").css("border-bottom", "2px solid #F90A0A");
+					error_name = true;
+				}
+			} 
+			
+			function check_relation() {
+				let relation = $("#relation").val();
+				if(relation !== '') {
+					$("#relation_error_message").hide();
+					$("#relation").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#relation_error_message").html("Please specify the type of relation!");
+					$("#relation_error_message").show();
+					$("#relation").css("border-bottom", "2px solid #F90A0A");
+					error_relation = true;
+				}
+			} 
+			
+			function check_gender() {
+				let gender = $("#gender").val();
+				if(relation !== '') {
+					$("#gender_error_message").hide();
+					$("#gender").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#gender_error_message").html("Please specify the gender!");
+					$("#gender_error_message").show();
+					$("#gender").css("border-bottom", "2px solid #F90A0A");
+					error_gender = true;
+				}
+			} 
+			
+			function check_age() {
+				let age = $("#age").val();
+				if(age !== '') {
+					$("#age_error_message").hide();
+					$("#age").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#age_error_message").html("Could you tell the age?");
+					$("#age_error_message").show();
+					$("#age").css("border-bottom", "2px solid #F90A0A");
+					error_age = true;
+				}
+			} 
+			
+			function check_dateOfBirthBS() {
+				let dateOfBirthBS = $("#date_of_birth_BS").val();
+				if(dateOfBirthBS !== '') {
+					$("#dateOfBirthBS_error_message").hide();
+					$("#date_of_birth_BS").css("border", "2px solid #34F458");
+				} else {
+					$("#dateOfBirthBS_error_message").html("Could you provide the date of birth from the calender?");
+					$("#dateOfBirthBS_error_message").show();
+					$("#date_of_birth_BS").css("border", "2px solid #F90A0A");
+					error_dateOfBirthBS = true;
+				}
+			} 
+			
+			function check_maritalStatus() {
+				let maritalStatus = $("#marital_status").val();
+				if(maritalStatus !== '') {
+					$("#maritalStatus_error_message").hide();
+					$("#marital_status").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#maritalStatus_error_message").html("Please specify the marital status");
+					$("#maritalStatus_error_message").show();
+					$("#marital_status").css("border-bottom", "2px solid #F90A0A");
+					error_maritalStatus = true;
+				}
+			} 
+			
+			function check_education() {
+				let education = $("#education").val();
+				if(education !== '') {
+					$("#education_error_message").hide();
+					$("#education").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#education_error_message").html("Please specify the educational qualification");
+					$("#edcuation_error_message").show();
+					$("#education").css("border-bottom", "2px solid #F90A0A");
+					error_education = true;
+				}
+			} 
+			
+			function check_occupation() {
+				let occupation = $("#occupation").val();
+				if(occupation !== '') {
+					$("#occupation_error_message").hide();
+					$("#occupation").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#occupation_error_message").html("Please specify occupation");
+					$("#occupation_error_message").show();
+					$("#occupation").css("border-bottom", "2px solid #F90A0A");
+					error_occupation = true;
+				}
+			} 
+			
+			function check_voterCard() {
+				let voterCard = $("#voter_card").val();
+				if(voterCard !== '') {
+					$("#voterCard_error_message").hide();
+					$("#voter_card").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#voterCard_error_message").html("Does the family member have voting card?");
+					$("#voterCard_error_message").show();
+					$("#voter_card").css("border-bottom", "2px solid #F90A0A");
+					error_votingCard = true;
+				}
+			}
+			
+// 			function check_migration() {
+// 				let migration = $("#migration").val();
+// 				if(migration !== '') {
+// 					$("#migration_error_message").hide();
+// 					$("#migration").css("border-bottom", "2px solid #34F458");
+// 				} else {
+// 					$("#migration_error_message").html("Please specify the migration status!");
+// 					$("#migration_error_message").show();
+// 					$("#migration").css("border-bottom", "2px solid #F90A0A");
+// 					error_migration = true;
+// 				}
+// 			}
+			
+			function check_health() {
+				let health = $("#health").val();
+				if(health !== '') {
+					$("#health_error_message").hide();
+					$("#health").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#health_error_message").html("Please specify the health status!");
+					$("#health_error_message").show();
+					$("#health").css("border-bottom", "2px solid #F90A0A");
+					error_health = true;
+				}
+			}
+			
+			
+		$(function() {
+			$("#member-entry-submit").click(function(event) {
+			event.preventDefault();
+				
+			error_name = false;
+			error_relation = false;
+			error_gender = false;
+			error_age = false;
+			error_dateOfBirthBS = false;
+			error_maritalStatus = false;
+			error_edcuation = false;
+			error_occupation = false;
+			error_voterCard = false;
+// 			error_migration = false;
+			error_health = false;
+				
+				
+			check_name();
+			check_relation();
+			check_gender();
+			check_age();
+			check_dateOfBirthBS();
+			check_maritalStatus();
+			check_education();
+			check_occupation();
+			check_voterCard();
+// 			check_migration();
+			check_health();
+				
+			if(error_name === false && error_relation === false && error_gender === false && error_age === false && error_dateOfBirthBS === false && error_maritalStatus === false &&
+					error_education === false && error_occupation === false && error_voterCard === false && error_health === false) {
+					
+					//Getting the data from the form	
+					let memberName = $("#name").val();
+					let relation = $("#relation").val();
+					let gender = $("#gender").val();
+					let age = $("#age").val();
+					let dateOfBirthBS = $("#date_of_birth_BS").val();
+					let dateOfBirthAD = $("#date_of_birth_AD").val();
+					let maritalStatus = $("#marital_status").val();
+					let education = $("#education").val();
+					let occupation = $("#occupation").val();
+					let voterCard = $("#voter_card").val();
+// 					let migration = $("#migration").val();
+					let healthStatus = $("#health").val();
+					let educationalInstitute = $("#educational_institute").val();
+					let disability = $("#disability").val();
+					let familyId = mainId;
+					
+					let memberInfo = {};
+					memberInfo.name = memberName;
+					memberInfo.relation = relation;
+					memberInfo.gender = gender;
+					memberInfo.age = age;
+					memberInfo.dateOfBirthBS = dateOfBirthBS;
+					memberInfo.dateOfBirthAD = dateOfBirthAD;
+					memberInfo.maritalStatus = maritalStatus;
+					memberInfo.education = education;
+					memberInfo.occupation = occupation;
+					memberInfo.educationalInstitute = educationalInstitute;
+					memberInfo.disability = disability;
+					if(voterCard == 1) {
+						memberInfo.voterCard = "true";
+					}
+					else if(voterCard == 0) {
+						memberInfo.voterCard = "false";
+					}
+// 					memberInfo.address = migration;
+					memberInfo.healthCondition = healthStatus;
+					memberInfo.mainId = familyId;
+
+					
+					console.log(memberInfo);
+					
+					// Now create an ajax request to send member details to the server
+					$.ajax({
+						method : "POST",
+						url : contextPath + "/resident/",
+						data : JSON.stringify(memberInfo),
+						contentType : "Application/Json",
+						success : function(result) {
+							swal.fire(
+								{
+									text : result.data,
+									icon : "success",
+									closeOnClickOutside : false,
+									closeOnEsc : false
+								}).then(function() {
+									window.location.href = contextPath + "/resident/" + familyId;
+								});
+						},
+						error : function(error) {
+						}
+					});
+				} else {
+					swal.fire({
+		            	icon: "info",
+		            	text: "Please enter the required fields correctly :(",
+		        	});
+				}
+			}) 
+		});
+	});
+	</script>
+</body>
+</html>

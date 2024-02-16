@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="utf-8" />
+<!--favicon-->
+<link rel="icon" th:href="@{/assets/images/favicon1.ico}"
+	href="assets/images/favicon1.ico" type="image/x-icon" />
+<link th:href="@{/assets/plugins/vectormap/jquery-jvectormap-2.0.2.css}"
+	href="assets/plugins/vectormap/jquery-jvectormap-2.0.2.css"
+	rel="stylesheet" />
+<link th:href="@{/assets/plugins/simplebar/css/simplebar.css}"
+	href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+<link th:href="@{/assets/css/bootstrap.min.css}"
+	href="assets/css/bootstrap.min.css" rel="stylesheet" />
+<link th:href="@{/assets/css/animate.css}" href="assets/css/animate.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/icons.css}" href="assets/css/icons.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/sidebar-menu.css}"
+	href="assets/css/sidebar-menu.css" rel="stylesheet" />
+<link th:href="@{/assets/css/app-style.css}"
+	href="assets/css/app-style.css" rel="stylesheet" />
+
+<link rel="stylesheet" th:href="@{/assets/css/uniform.css}"
+	href="assets/css/uniform.css" />
+<link rel="stylesheet" th:href="@{/assets/css/select2.css}"
+	href="assets/css/select2.css" />
+<link rel="stylesheet" th:href="@{/assets/css/matrix-style.css}"
+	href="assets/css/matrix-style.css" />
+<link rel="stylesheet" th:href="@{/assets/css/matrix-media.css}"
+	href="assets/css/matrix-media.css" />
+
+
+<link th:href="@{/assets/css/custom.css}" href="assets/css/custom.css"
+	rel="stylesheet" />
+<link th:href="@{/assets/css/responsive.css}"
+	href="assets/css/responsive.css" rel="stylesheet" />
+</head>
+<body>
+		<!--Start topbar header-->
+		<header class="topbar-nav" th:fragment="header">
+			<nav class="navbar navbar-expand fixed-top">
+				<ul class="navbar-nav mr-auto align-items-center">
+					<li class="nav-item">
+						<a class="nav-link toggle-menu" href="javascript:void();"> <i class="icon-menu menu-icon"></i>
+						</a>
+					</li>
+				</ul>
+				<div th:replace="~{public/favourite-place :: buttonFragment}"></div>			</nav>
+		</header>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+<title>दक्षिणकाली नगरपालिका</title>
+<!--favicon-->
+<link rel="icon" th:href="@{/assets/images/favicon1.ico}"
+	href="assets/images/favicon1.ico" type="image/x-icon" />
+<link th:href="@{/assets/plugins/vectormap/jquery-jvectormap-2.0.2.css}"
+	href="assets/plugins/vectormap/jquery-jvectormap-2.0.2.css"
+	rel="stylesheet" />
+<link th:href="@{/assets/plugins/simplebar/css/simplebar.css}"
+	href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+<link th:href="@{/assets/css/bootstrap.min.css}"
+	href="assets/css/bootstrap.min.css" rel="stylesheet" />
+<link th:href="@{/assets/css/animate.css}" href="assets/css/animate.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/icons.css}" href="assets/css/icons.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/sidebar-menu.css}"
+	href="assets/css/sidebar-menu.css" rel="stylesheet" />
+<link th:href="@{/assets/css/app-style.css}"
+	href="assets/css/app-style.css" rel="stylesheet" />
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/nepali-datepicker/nepaliDatePicker.min.css}"
+	href="assets/plugins/nepali-datepicker/nepaliDatePicker.min.css">
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/datatable/datatables.min.css}"
+	href="assets/plugins/datatable/datatables.min.css">
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/jquery.steps/css/jquery.steps.css}"
+	href="assets/plugins/jquery.steps/css/jquery.steps.css">
+</head>
+<style>
+	button.nav_btn-top {
+    color: white !important;
+}
+.nav_btn button {
+    margin-right: 22px;
+}
+.header_ul .ui_input-field {
+    height: 26px;
+    width: 38%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    margin-left: 10px;
+}
+.table thead th {
+    font-size: .9rem;
+
+}
+a.btn.btn-xs.btn-success {
+    color: white;
+}
+.btn {
+    font-size: .9rem;
+
+}
+label {
+
+    font-size: 14px;
+
+}
+.btn-info {
+    color: #fff;
+    background-color: #03d0ea;
+    border-color: #03d0ea;
+    color: white !IMPORTANT;
+}
+</style>
+<body>
+	<div id="wrapper">
+		<!-- Side bar and header -->
+		<div sec:authorize="isAuthenticated()" th:replace="~{fragments/private-sidebar :: private-sidebar}"></div>
+		<div sec:authorize="!isAuthenticated()" th:replace="~{fragments/public-sidebar :: public-sidebar}"></div>
+		<header th:replace="~{fragments/header :: header}" class="header1"> </header>
+		<div class="clearfix"></div>
+		<div class="content-wrapper">
+			<div class="container-fluid" id="pjax-container">
+				<div class="row pt-2 pb-2">
+					<div class="col-sm-9">
+						<h4 class="page-title">नगरबासी बिवरण कम्प्युटर प्रणाली</h4>
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="javaScript:void();">गृहपृष्ठ
+							</a></li>
+							<li class="breadcrumb-item active" aria-current="page">	वडा</li>
+						</ol>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-12 col-md-12">
+						<div class="table-responsive ward-list padding-panel">
+							<a sec:authorize="hasAnyRole('CENTRAL_ADMIN')" href="#" th:href="@{/ward/add}"
+								class="btn btn-xs btn-danger"> वडा थप्नुहोस्</a>
+							<table th:if="${wardList.size() > 0}"
+								class="table table-striped table-hover" id="grid">
+								<thead>
+									<tr>
+										<th><strong>ऋ.स..</strong></th>
+										<th><strong>स्थान</strong></th>
+										<th><strong>वडा नम्बर</strong></th>
+										<th><strong>कार्यहरू</strong></th>
+									</tr>
+								</thead>
+
+								<tbody id="ward-list-body">
+									<tr class=""
+										th:each="ward,iteration : ${wardList}">
+										<td th:text="${iteration.index + 1}"></td>
+										<td th:text="${ward.wardLocation}"></td>
+										<td th:text="${ward.wardNumber}"></td>
+										<td>
+											<a sec:authorize="hasAnyRole('CENTRAL_ADMIN')" href="#"
+											th:href="@{/ward/edit/} + ${ward.wardNumber}"
+											class="btn btn-xs btn-warning">संशोधन</a>
+											
+											<button sec:authorize="hasAnyRole('CENTRAL_ADMIN')" class="btn btn-xs btn-danger" th:attr="onclick=|deleteWard('${ward.WardNumber}')|">
+												हटानुस
+											</button>
+											<a href="#"
+											th:href="@{/ward/} + ${ward.wardNumber}"
+											class="btn btn-xs btn-success">पूर्ण विवरण</a>
+										</td>
+									</tr>
+								</tbody>
+
+							</table>
+							<table
+								th:if="${wardList == null || #lists.isEmpty(wardList)}">
+								<thead>
+									<tr>
+										<td><h2>माफ गर्नुहोला | प्रणालीमा कुनैपनि बिवरण भेटीएन|</h2></td>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+		<a href="javaScript:void();" class="back-to-top"><i
+			class="fa fa-angle-double-up"></i> </a>
+		<!--Start footer-->
+		<footer th:replace="~{fragments/footer :: footer}"></footer>
+	</div>
+	<div th:replace="~{fragments/scripts :: scripts}">
+	</div>
+	<script th:inline="javascript">
+		$(function() {
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$(document).ajaxSend(function(e, xhr, options) {
+				xhr.setRequestHeader(header, token);
+			});
+		});
+
+		// For deleting favPlace
+		function deleteWard(wardNumber) {
+			swal.fire({
+				title : 'Are you sure you want to delete this ward?',
+				text : "You won't be able to revert this!",
+				icon : 'warning',
+				showCancelButton : true,
+				confirmButtonColor : '#3085d6',
+				cancelButtonColor : '#d33',
+				confirmButtonText : 'Yes, delete it!'
+			}).then((btnClicked) => {
+				if(btnClicked.value) {
+					$.ajax({
+						url : contextPath + "/ward/" + wardNumber,
+						method : "DELETE",
+						success : function(data) {
+							swal.fire({
+								icon : "success",
+								text : "The ward has been removed"
+							}).then((btnClick) => {
+								if(btnClick.value) {
+									location.reload(true);		
+								}
+							});
+						}
+					});
+				}
+			});
+		}
+	</script>
+</body>
+</html>

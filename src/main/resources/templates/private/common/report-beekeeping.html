@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+<title>दक्षिणकाली नगरपालिका</title>
+<!--favicon-->
+<link rel="icon" th:href="@{/assets/images/favicon1.ico}"
+	href="assets/images/favicon1.ico" type="image/x-icon" />
+<link th:href="@{/assets/plugins/vectormap/jquery-jvectormap-2.0.2.css}"
+	href="assets/plugins/vectormap/jquery-jvectormap-2.0.2.css"
+	rel="stylesheet" />
+<link th:href="@{/assets/plugins/simplebar/css/simplebar.css}"
+	href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+<link th:href="@{/assets/css/bootstrap.min.css}"
+	href="assets/css/bootstrap.min.css" rel="stylesheet" />
+<link th:href="@{/assets/css/animate.css}" href="assets/css/animate.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/icons.css}" href="assets/css/icons.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/sidebar-menu.css}"
+	href="assets/css/sidebar-menu.css" rel="stylesheet" />
+<link th:href="@{/assets/css/app-style.css}"
+	href="assets/css/app-style.css" rel="stylesheet" />
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/nepali-datepicker/nepaliDatePicker.min.css}"
+	href="assets/plugins/nepali-datepicker/nepaliDatePicker.min.css">
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/datatable/datatables.min.css}"
+	href="assets/plugins/datatable/datatables.min.css">
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/jquery.steps/css/jquery.steps.css}"
+	href="assets/plugins/jquery.steps/css/jquery.steps.css">
+</head>
+<body>
+	<div id="wrapper">
+		<!-- Side bar and header -->
+		<div sec:authorize="isAuthenticated()" th:replace="~{fragments/private-sidebar :: private-sidebar}"></div>
+		<div sec:authorize="!isAuthenticated()" th:replace="~{fragments/public-sidebar :: public-sidebar}"></div>
+		<header th:replace="~{fragments/header :: header}" class="header1"> </header>
+		<div class="clearfix"></div>
+		<div class="content-wrapper">
+			<div class="container-fluid" id="pjax-container">
+				<div class="row pt-2 pb-2">
+					<div class="col-sm-9">
+						<h4 class="page-title">नगरबासी बिवरण कम्प्युटर प्रणाली</h4>
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="javaScript:void();">Home</a></li>
+							<li class="breadcrumb-item active" aria-current="page">Bee Keeping Report</li>
+						</ol>
+					</div>
+				</div>
+
+<!-- 				<div class="row"> -->
+ <!-- 					<div class="row"> -->
+<!-- 							<div class="col-md-2"> -->
+<!-- 								<div class="ui"> -->
+<!-- 									<label >Show&nbsp; -->
+<!-- 										<select id="page-limit-select" class="ui input"> -->
+<!-- 											<option value="10">10</option> -->
+<!-- 											<option value="25">25</option> -->
+<!-- 											<option value="50">50</option> -->
+<!-- 											<option value="100">100</option> -->
+<!-- 											10 25 50 100 -->
+<!-- 										</select>&nbsp; -->
+<!-- 										 entries -->
+<!-- 									</label> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+							
+<!-- 							<div class="col-md-2"> -->
+<!-- 								<div class="ui"> -->
+<!-- 									<label >Ward&nbsp; -->
+<!-- 										<select id="ward-wise-select" class="ui input"> -->
+<!-- 											<option value=""></option> -->
+<!-- 											<option th:value="${indx.index} + 1" th:each="option, indx : ${wards}" th:text="${option}"></option> -->
+<!-- 										</select> -->
+<!-- 									</label> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+							
+							
+<!-- 							<div class="col-md-2"> -->
+<!-- 								<div class="ui"> -->
+<!-- 									<label >Place Type&nbsp; -->
+<!-- 										<select id="placeType-wise-select" class="ui input"> -->
+<!-- 											<option value=""></option> -->
+<!-- 											<option th:value="${indx.index} + 1" th:each="option, indx : ${placeTypes}" th:text="${option}"></option> -->
+<!-- 										</select> -->
+<!-- 									</label> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+							
+							
+<!-- 							<div class="col-md-2"> -->
+<!-- 								<div class="ui"> -->
+<!-- 									<label> -->
+<!-- 										Sorted By:&nbsp;<span class="ui" id="sortedBySpan"> -->
+<!-- 										</span> -->
+<!-- 									</label> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+
+							
+<!-- 							<div class="col-md-2"> -->
+<!-- 								<div class="ui pull-right"> -->
+<!-- 									<label> -->
+<!-- 										Search:&nbsp;<span class="ui input"> -->
+<!-- 											<input type="text" id="search" placeholder="स्थलको नामबाट खोज्नुहोस" /> -->
+<!-- 										</span> -->
+<!-- 									</label> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+<!-- 						</div> -->
+
+					<div class="col-lg-12 col-md-12">
+						<div class="table-responsive beekeeping-list padding-panel">
+							<table th:if="${beekeepingList.size() > 0}"
+								class="table table-striped table-hover" id="grid">
+								<thead>
+									<tr>
+										<th><strong>No.</strong></th>
+										<th><strong>Name of the Owner</strong></th>
+										<th><strong>Ward Number</strong></th>
+										<th><strong>No of Beehives</strong></th>
+<!-- 										<th><strong>Species of Bee</strong></th> -->
+										<th><strong>Yearly Honey Production</strong></th>
+									</tr>
+								</thead>
+
+								<tbody id="beekeeping-report-body">
+									<tr class=""
+										th:each="report,iteration : ${beekeepingList}">
+										<td th:text="${iteration.index + 1}"></td>
+										<td th:text="${report.ownerName}"></td>
+										<td th:text="${report.wardNo}"></td>
+<!-- 										<td th:text="${report.beeHiveNo}"></td> -->
+<!-- 										<td th:text="${#strings.substring(report.beeHiveNo,0,99)}"></td> -->
+										<td th:text="${#strings.substringAfter(report.beeHiveNo,'0:')}"></td>
+										
+										
+<!-- 										<td th:text="${report.beeSpecies}"></td> -->
+						
+<!-- 										<td th:text="${report.yearlyProduction}"></td> -->
+										<td>
+											<span th:if="${report.yearlyProduction} != ''" th:text="${report.yearlyProduction} + '&nbsp;'  + kg"></span>
+   											<span th:unless="${report.yearlyProduction} != ''" >थाहा छैन</span>
+										</td>
+										
+										
+									</tr>
+								</tbody>
+
+							</table>
+							<table
+								th:if="${beekeepingList == null || #lists.isEmpty(beekeepingList)}">
+								<thead>
+									<tr>
+										<td><h2>माफ गर्नुहोला | प्रणालीमा कुनैपनि बिवरण भेटीएन|</h2></td>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+<!-- 				</div> -->
+
+<!-- 						<div class="ui stackable pagination menu pull-right"> -->
+<!-- 				<div class="paginate_button item previous disabled" id="grid_previous" href="#" aria-controls="grid" data-dt-idx="0" tabindex="0">Previous</div> -->
+<!-- 				<a class="paginate_button item active" aria-controls="grid" data-dt-idx="1" tabindex="0" id="pageNumberPagination">1</a> -->
+<!-- 				<a class="paginate_button item next" id="grid_next" href="#" aria-controls="grid" data-dt-idx="8" tabindex="0">Next</a></div> -->
+			</div>
+		</div>
+		<a href="javaScript:void();" class="back-to-top"><i
+			class="fa fa-angle-double-up"></i> </a>
+		<!--Start footer-->
+		<footer th:replace="~{fragments/footer :: footer}"></footer>
+	</div>
+	<div th:replace="~{fragments/scripts :: scripts}">
+	</div>
+
+</body>
+</html>

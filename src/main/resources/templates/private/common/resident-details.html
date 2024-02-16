@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+<title>दक्षिणकाली नगरपालिका</title>
+<!--favicon-->
+<link rel="icon" th:href="@{/assets/images/favicon1.ico}"
+	href="assets/images/favicon1.ico" type="image/x-icon" />
+<link th:href="@{/assets/plugins/vectormap/jquery-jvectormap-2.0.2.css}"
+	href="assets/plugins/vectormap/jquery-jvectormap-2.0.2.css"
+	rel="stylesheet" />
+<link th:href="@{/assets/plugins/simplebar/css/simplebar.css}"
+	href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+<link th:href="@{/assets/css/bootstrap.min.css}"
+	href="assets/css/bootstrap.min.css" rel="stylesheet" />
+<link th:href="@{/assets/css/animate.css}" href="assets/css/animate.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/icons.css}" href="assets/css/icons.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/sidebar-menu.css}"
+	href="assets/css/sidebar-menu.css" rel="stylesheet" />
+<link th:href="@{/assets/css/app-style.css}"
+	href="assets/css/app-style.css" rel="stylesheet" />
+
+
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/nepali-datepicker/nepaliDatePicker.min.css}"
+	href="assets/plugins/nepali-datepicker/nepaliDatePicker.min.css">
+
+
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/datatable/datatables.min.css}"
+	href="assets/plugins/datatable/datatables.min.css">
+
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/jquery.steps/css/jquery.steps.css}"
+	href="assets/plugins/jquery.steps/css/jquery.steps.css">
+
+<link rel="stylesheet" th:href="@{/assets/css/leaflet.css}" />
+
+
+<style type="text/css">
+.printForm .first_cell {
+	width: 30px;
+}
+
+.printForm td, span {
+	font-size: 13px;
+	position: relative;
+}
+
+.table thead th {
+	font-size: 13px;
+}
+
+.printForm [type="checkbox"]:not (:checked )+span, .printForm [type="radio"]:not
+	 (:checked )+span {
+	display: none;
+}
+/* Base for span styling */
+.printForm [type="checkbox"]:not (:checked ), .printForm [type="checkbox"]:checked,
+	.printForm [type="radio"]:not (:checked ), .printForm [type="radio"]:checked
+	{
+	position: absolute;
+	left: -9999px;
+}
+
+.green {
+	background: green !important;
+	color: #fff;
+}
+
+.red {
+	background: red !important;
+	color: #fff;
+}
+
+.ui.grid {
+	margin-right: 0;
+	margin-left: 0;
+	width: 100%;
+}
+
+.table-borderless td {
+	border: none;
+}
+
+#surveyMap {
+	height: 70em;
+	width: 70em;
+}
+
+.float{
+	position:fixed;
+	width:40px;
+	height:40px;
+	background-color:#0C9;
+	color:#FFF;
+	border-radius:50px;
+	text-align:center;
+	box-shadow: 2px 2px 3px #999;
+}
+
+.my-float{
+	margin-top:14px;
+}
+</style>
+</head>
+<body>
+	<div id="wrapper">
+		<!-- Side bar and header -->
+		<div th:replace="~{fragments/private-sidebar :: private-sidebar}"></div>
+		<header th:replace="~{fragments/header :: header}" class="header1">
+		</header>
+		<div class="clearfix"></div>
+		<div class="content-wrapper"
+			th:if="${residentFullDetail != null && residentFullDetail.residentDetail != null}">
+			<!-- <button id="goBackButton1" class="btn btn-primary">Go Back</button> -->
+			<a href="#" class="float" id="goBackButton" style="z-index: 99;">
+			<i class="fa fa-arrow-left my-float"></i>
+			</a> 
+			<div class="container-fluid" id="pjax-container">
+				<div class="row pt-2 pb-2">
+					<div class="col-sm-6">
+						<h4 class="page-title" style="padding-left:2em;"
+							th:text="${residentFullDetail.residentDetail.answer1} + ' को पूर्ण विवरण'">Godawari
+							Nagarpalika Full Detail</h4>
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="javaScript:void();">Home</a></li>
+							<li class="breadcrumb-item active" aria-current="page">Household
+								Members List</li>
+						</ol>
+					</div>
+					<div class="col-sm-6" sec:authorize="hasAnyRole('CENTRAL_ADMIN', 'WARD_ADMIN', 'SURVEYOR')">
+						<div class="pull-right">
+							<!-- Button for showing the modal for Map Location  -->
+							<button id="view-location-btn"
+								class="block2-user-id btn btn-success">यस स्थान
+								मानचित्रमा हेर्नुहोस</button>
+							<!-- Button for adding family member  -->
+							<a
+								th:href="@{/resident/} + ${residentFullDetail.residentDetail.filledId} +'/member/'"><button
+									sec:authorize="hasAnyRole('CENTRAL_ADMIN', 'WARD_ADMIN', 'SURVEYOR')"
+									class="btn btn-xs btn-primary">Add Family Member</button></a>
+
+							<!-- Button for printing data  -->
+							<!-- 						<div class="btn-print"> -->
+							<button id="print" class="btn btn-primary">Print this
+								page</button>
+							<!-- 						</div> -->
+						</div>
+					</div>
+				</div>
+				<div class="saibu-display-form print table-responsive printForm" style="display:none">
+					<div class="data-heading-row">
+						<div class="row">
+							<div class="col-lg-2 col-md-12">
+								<a th:href="${residentFullDetail.residentDetail.answer51}"
+									style="display: block" target="_blank" class="no-pjax"><img
+									th:src="${residentFullDetail.residentDetail.answer51}"
+									class="media-object house-detail-photo"
+									style="width: 150px; height: 150px;"></a>
+							</div>
+							<div class="col-lg-10 col-md-12">
+								<table class="table">
+									<tbody>
+										<tr>
+											<td><strong>घरमुलीको नाम</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer1}"></td>
+											<td><strong>टोल</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer2}"></td>
+											<td><strong>घर नं</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer4}"></td>
+											<td><strong>फोन नं</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer5}"></td>
+										</tr>
+										<tr>
+											<td><strong>बुबाको नाम</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer6}">दुर्गा
+												बहादुर राउत</td>
+											<td><strong>आमाको नाम</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer7}">कान्छी
+												राउत</td>
+											<td><strong>जाति</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer9}">ब्रहमण/क्षेत्री</td>
+											<td><strong>धर्म</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer10}">हिन्दू
+												धर्म</td>
+										</tr>
+										<tr>
+											<td><strong>पुर्खोली भाषा</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer8}">नेपाली</td>
+											<td><strong>पहिलो भाषा</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer98}">नेपाली</td>
+											<td><strong>दोस्रो भाषा</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer99}">नेपाली</td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td><strong>नागरिकता नं</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer11}">१३/१६४१</td>
+											<td><strong>नागरिकता लिएको जिल्ला</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer12}">ललितपुर</td>
+											<td><strong>स्थायी ठेगाना</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer74}"></td>
+											<td></td>
+											<td></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-12 col-md-12">
+							<div class="table-responsive">
+								<table class="table table-striped table-hover table-member"
+									id="grid"
+									th:if="${residentFullDetail.familyMembers != null && #lists.size(residentFullDetail.familyMembers) > 0}">
+									<thead>
+										<tr>
+											<th rowspan="2"><strong>ऋ.स</strong></th>
+											<th><strong>१</strong></th>
+											<th><strong>२</strong></th>
+											<th><strong>३</strong></th>
+											<th><strong>४</strong></th>
+											<th><strong>५</strong></th>
+											<th><strong>६</strong></th>
+											<th><strong>७</strong></th>
+											<th><strong>८</strong></th>
+											<th><strong>९</strong></th>
+											<th><strong>१० </strong></th>
+											<th rowspan="2" class="rm-print"><strong>#</strong></th>
+										</tr>
+										<tr>
+											<th><strong>नाम थर</strong></th>
+											<th><strong>नाता</strong></th>
+											<th><strong>लिङ्ग</strong></th>
+											<th><strong>उमेर</strong></th>
+											<th><strong>वैवाहिक<br> स्थिति
+											</strong></th>
+											<th><strong>सैक्षिक योग्येता</strong></th>
+											<th><strong>पेशा</strong></th>
+											<th><strong>मतदाता<br> परिचयपत्र
+											</strong></th>
+											<th><strong>स्वास्थ्य अवस्था</strong></th>
+											<th sec:authorize="hasAnyRole('CENTRAL_ADMIN', 'WARD_ADMIN', 'SURVEYOR')"><strong>कार्यहरू</strong></th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr
+											th:each="member,iteration: ${residentFullDetail.familyMembers}">
+											<td th:text="${iteration.index + 1}">1</td>
+											<td th:text="${member.name}"></td>
+											<td th:text="${member.relation}"></td>
+											<td th:text="${member.gender}"></td>
+											<td th:text="${member.age}"></td>
+											<td th:text="${member.maritalStatus}"></td>
+											<td th:text="${member.education}"></td>
+											<td th:text="${member.occupation}"></td>
+											<td th:text="${member.voterCard} == 'true' ? 'छ' : 'छैन'"></td>
+											<td th:text="${member.healthCondition}"></td>
+											<td sec:authorize="hasAnyRole('CENTRAL_ADMIN', 'WARD_ADMIN', 'SURVEYOR')" ><a href="#"
+												th:href="@{/resident/member/} + ${member.memberId}"
+												class="btn btn-xs btn-success">Edit Detail</a>
+												<button
+													sec:authorize="hasAnyRole('CENTRAL_ADMIN', 'WARD_ADMIN', 'SURVEYOR')"
+													class="btn btn-xs btn-warning"
+													th:attr="onclick=|deleteMemberInfo('${member.memberId}')|">
+													Delete</button> <a href="#" th:data="${member.memberId}"
+												class="btn btn-xs btn-danger">Mark Demise</a>
+											<td>
+										</tr>
+									</tbody>
+								</table>
+								<table
+									th:if="${residentFullDetail.familyMembers == null || #lists.isEmpty(residentFullDetail.familyMembers)}">
+									<thead>
+										<tr>
+											<td><h2>माफ गर्नुहोला | परिवारको कुनै पनि सदस्य
+													भेटीएन वा प्रणालीमा बिवरण राखिएको छैन |</h2></td>
+										</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-12 col-md-12">
+							<div class="table-responsive">
+								<table class="table table-striped table-member">
+									<tbody>
+										<tr>
+											<td>१३. <strong>कित्ता नं </strong>: <strong
+												th:text="${residentFullDetail.residentDetail.answer13}"></strong></td>
+											<td>१४. <strong>घर संख्या</strong>: <strong
+												th:text="${residentFullDetail.residentDetail.answer14}"></strong></td>
+											<td>१५. <strong>घरको तल्ला</strong>: <strong
+												th:text="${residentFullDetail.residentDetail.answer18}"></strong></td>
+											<td>१६. <strong>घरको छानाको प्रकार</strong>: <strong
+												th:text="${residentFullDetail.residentDetail.answer22}"></strong></td> 
+											
+										</tr>
+										<tr>
+											<td>१७. <strong>घरको जगको प्रकार</strong>: <strong
+												th:text="${residentFullDetail.residentDetail.answer23}"></strong></td>
+											<td>१८. <strong>व्यवसाय</strong>: <strong
+												th:text="${residentFullDetail.residentDetail.answer15}"></strong></td>
+											<td>१९. <strong>व्यवसायी</strong>: <strong
+												th:text="${residentFullDetail.residentDetail.answer16}"></strong></td>
+											<td>२०. <strong>फोन नं</strong>: <strong
+												th:text="${residentFullDetail.residentDetail.answer17}"></strong></td>
+										</tr>
+										<tr>
+											<td>२१. <strong>पानी</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer19}"></td>
+											<td>२२. <strong>निकास</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer20}"></td>
+										</tr>
+										<tr>
+											<td>२३. <strong>बत्ती</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer36}"></td>
+											<td>२४. <strong>सवारी साधन</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer21}"></td>
+										</tr>
+										<tr>
+											<td>२५. <strong>वैदेशिक रोजगार</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer32}"></td>
+											<td>२६. <strong>वैदेशिक अध्ययन</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer33}"></td>
+										</tr>
+										<tr>
+											<td>२७. <strong>खाना पकाउन पर्योग हुने इन्धन</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer37}"></td>
+											<td>२८. <strong>घरबाट उत्पादन भएको फोहोरको ब्यबस्था
+											</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer35}"></td>
+										</tr>
+										<tr>
+											<td>२९. <strong>सञ्चार सुविधा</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer38}"></td>
+											<td>३०. <strong>घर जग्गाको विवरण</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer39}"></td>
+										</tr>
+										<tr>
+											<td>३१. <strong>वार्षिक आम्दानी</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer40}"></td>
+											<td>३२. <strong>वार्षिक खर्च</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer41}"></td>
+										</tr>
+										<tr>
+											<td>३३. <strong>आफ्नो उत्पादन तथा आय स्रोतले कति महिना खान पुग्छ?</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer43}"></td>
+											<td>३४. <strong>घर भुकम्प प्रतिरोधात्मक</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer24}"></td>
+										</tr>
+										<tr>
+											<td>३५. <strong>तपाईको घर वा परिवारलाई २०७२ सालको भुकम्पले के-कस्तो क्षेती पुर्यायो?</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer25}"></td>
+											<td>३६. <strong>घर क्षती भएको भए पुनः निर्माण गर्नु भयो?</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer26}"></td>
+										</tr>
+										<tr>
+											<td>३७. <strong>तपाईको घर परिवारलाई अहिले कुनै प्रकारको जोखिम छ?</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer27}"></td>
+											<td>३८. <strong>जोखिमको समयमा सबैभन्दा पहिलो उद्धार कसले गरेको थियो? </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer28}"></td>
+										</tr>
+										<tr>
+											<td>३९. <strong>पछिल्लो ५ वर्षमा तपाईको घर परिवारले कस्तो किसिमका जोखिम सामना गर्नु पर्यो? </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer29}"></td>
+											<td>४०. <strong>तपाईको विचारमा यस क्षेत्रमा तलका मध्ये कुन-कुन जोखिमको खतरा उच्च छ? <br> (१ देखि ७ सम्म स्तरीकरण गर्नुहोस्। १ लाई उच्च र ७ लाई न्युन जोखिम मान्नुहोस्) </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer30}"></td>
+										</tr>
+										<tr>
+											<td>४१. <strong>भविष्यमा हुन सक्ने जोखिम नियन्त्रणको लागि के-कस्तो पुर्व तयारी गर्नु भएको छ?</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer31}"></td>
+											<td>४२. <strong>१६ वर्ष सम्मका बालबालिका अन्य ठाँउमा काम गर्न गएका छन्?</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer34}"></td>
+										</tr>
+										<tr>
+											<td>४३. <strong>तपाईको परिवारमा १८ वर्षभन्दा कम उमेरका भिन्न <br> शारीरिक तथा मानसिक क्षमता भएका(अपाङ्ग) सदस्यहरु (बालक)</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer52}"></td>
+											<td>४४. <strong>तपाईको परिवारमा १८ वर्षभन्दा कम उमेरका भिन्न <br> शारीरिक तथा मानसिक क्षमता भएका(अपाङ्ग) सदस्यहरु (बालिका)</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer53}"></td>
+										</tr>
+										<tr>
+											<td>४५. <strong>परिवारको कुनै सदस्य विरामी भएमा उपचारका लागि सबैभन्दा पहिला कहाँ जानुहुन्छ?</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer54}"></td>
+											<td>४६. <strong>बिचैमा विद्यालय जान छोडेका ६ - १५ वर्ष उमेर समुहका बालबालिकाहरुका संख्या</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer55}"></td>
+										</tr>
+										<tr>
+											<td>४७. <strong>बाल विकास केन्द्र वा पुर्व प्रा.वि. तहमा जाने ३ देखि ५ वर्षसम्मका बालबालिका संख्या</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer56}"></td>
+											<td>४८. <strong>तपाईको परिवारमा बालबालिकाले गल्ति गरेमा के गर्नु हुन्छ?</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer57}"></td>
+										</tr>
+										<tr>
+											<td>४९. <strong>तपाईको परिवारका कुनै बालबालिका सडक बालबालिकाको रुपमा रहेका छन्?</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer58}"></td>
+											<td>५०. <strong>तपाईको परिवारका बालबालिका पढ्ने विद्यालायमा भिन्न <br> शारीरिक क्षमता भएका विद्यार्थीका लागि विशेष शिक्षाको सुविधा छ?</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer59}"></td>
+										</tr>
+										<tr>
+											<td>५१. <strong>एक वर्षभित्र तपाईको परिवारमा महिला तथा बालबालिका <br> उपर हिंसा सम्बन्धी निम्न कुनै घटना घटेका छन/छैनन्?</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer60}"></td>
+											<td>५२. <strong>बितेको १ वर्षभित्र तपाईको परिवारमा ५ वर्षमुनिका <br> कुनै बालबालिकाको मृत्यु भएको छ?</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer61}"></td>
+										</tr>
+										<tr>
+											<td>५३. <strong>व्यवसाय फार्मको नाम </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer75}"></td>
+											<td>५४. <strong>व्यवसाय फार्म दर्ता गरेको छ वा छैन </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer76}"></td>
+										</tr>
+										<tr>
+											<td>५५. <strong>बाली बिमा गरेको छ वा छैन </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer77}"></td>
+											<td>५६. <strong>कृषि गर्न प्रयोग भएको जग्गा </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer78}"></td>
+										</tr>
+										<tr>
+											<td>५७. <strong>व्यवसाय फार्म कुनै समुहमा आवद्ध भएको </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer79}"></td>
+											<td>५८. <strong>खाद्दान्न बाली</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer80}"></td>
+										</tr>
+										<tr>
+											<td>५९. <strong>नगदे बाली</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer81}"></td>
+											<td>६०. <strong>दह बाली</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer82}"></td>
+										</tr>
+										<tr>
+											<td>६१. <strong>फलफुल</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer83}"></td>
+											<td>६२. <strong>तरकारी बाली</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer84}"></td>
+										</tr>
+										<tr>
+											<td>६३. <strong>अन्य बाली (पुष्प खेति, च्याउ)</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer85}"></td>
+											<td>६४. <strong>बेमौसमी खेति गरिऐको बालिको नाम </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer86}"></td>
+										</tr>
+										<tr>
+											<td>६५. <strong>प्लाष्टिक घर बनाएको(छ भने सङ्ख्या) </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer87}"></td>
+											<td>६६. <strong>बेमौसमी खेति गरिएको जग्गा </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer88}"></td>
+										</tr>
+										<tr>
+											<td>६७. <strong>मौरीपालन गर्नु भएको छ? (भए मौरीघार कति) </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer89}"></td>
+											<td>६८. <strong>मौरीपालन कुन जातको</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer90}"></td>
+										</tr>
+										<tr>
+											<td>६९. <strong>वार्षिक मह उत्पादन (के.जी) </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer91}"></td>
+											<td>७०. <strong>काम गर्ने कर्मचारीहरु कति छन ?</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer92}"></td>
+										</tr>
+										<tr>
+											<td>७१. <strong>कृषि गर्नको लागि बार्षिक खर्च कति लाग्छ? </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer44}"></td>
+											<td>७२. <strong>कृषिबाट बार्षिक आम्दानी कति जति हुन्छ?</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer45}"></td>
+										</tr>
+										<tr>
+											<td>७३. <strong>पशुपन्छी पालेकोः </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer62}"></td>
+											<td>७४. <strong>व्यवसाय दर्ता भएको</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer63}"></td>
+										</tr>
+										<tr>
+											<td>७५. <strong>चौपाया तथा पशुपंक्षी</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer42}"></td>
+											<td>७६. <strong>पशुपन्छी पालनको किसिम</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer64}"></td>
+										</tr>
+										<tr>
+											<td>७७. <strong>पशुपन्छीलाई रोग विरुद्ध खोप लगाउनु भएको </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer65}"></td>
+											<td>७८. <strong>पशुपन्छी पालन समुह आवद्धता</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer66}"></td>
+										</tr>
+										<tr>
+											<td>७९. <strong>व्यवसाय गर्न प्रयोग भएको जग्गाको विवरणः </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer67}"></td>
+											<td>८०. <strong>गोठको प्रकार</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer68}"></td>
+										</tr>
+										<tr>
+											<td>८१. <strong>पशुपन्छीलाई आवश्यक खाद्यान्न </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer69}"></td>
+											<td>८२. <strong>काम गर्ने कर्मचारीहरु </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer70}"></td>
+										</tr>
+										<tr>
+											<td>८३. <strong>पशुपन्छी पालनमा जम्मा वार्षिक खर्च </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer71}"></td>
+											<td>८४. <strong>पशुपन्छी पालनबाट वार्षिक आम्दानी</strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer72}"></td>
+										</tr>
+										<tr>
+											<td>८५. <strong>पशु बिमा गर्नुभएको </strong>:
+											</td>
+											<td th:text="${residentFullDetail.residentDetail.answer73}"></td>
+										</tr>
+										
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-12 col-md-12">
+							<div class="table-responsive">
+								<table class="table table-bordered  table-member">
+									<tbody>
+										<tr>
+											<td><strong>कागजातहरू</strong>:</td>
+											<td><span>नागरिकता</span><a
+												th:href="${residentFullDetail.residentDetail.answer46}"
+												target="blank"><img
+													th:src="${residentFullDetail.residentDetail.answer46}"
+													style="display: block; height: 300px; width: 300px"
+													class="img-thumbnail photo"
+													th:onerror="'this.src=\'' + @{/assets/images/no-image.png} + '\';'"></a></td>
+											<td><span>नाता प्रमाण-पत्र</span><a
+												th:href="${residentFullDetail.residentDetail.answer47}"
+												target="blank"><img
+													th:src="${residentFullDetail.residentDetail.answer47}"
+													style="display: block; height: 300px; width: 300px"
+													class="img-thumbnail photo"
+													th:onerror="'this.src=\'' + @{/assets/images/no-image.png} + '\';'"></a></td>
+											<td><span>पास भएको घरको नक्सा</span><a
+												th:href="${residentFullDetail.residentDetail.answer48}"
+												target="blank"><img
+													th:src="${residentFullDetail.residentDetail.answer48}"
+													style="display: block; height: 300px; width: 300px"
+													class="img-thumbnail photo"
+													th:onerror="'this.src=\'' + @{/assets/images/no-image.png} + '\';'"></a></td>
+											<td><span>अन्य कागजात</span><a
+												th:href="${residentFullDetail.residentDetail.answer49}"
+												target="blank"><img
+													th:src="${residentFullDetail.residentDetail.answer49}"
+													style="display: block; height: 300px; width: 300px"
+													class="img-thumbnail photo"
+													th:onerror="'this.src=\'' + @{/assets/images/no-image.png} + '\';'"></a></td>
+										</tr>
+									</tbody>
+								</table>
+								<table class="table table-bordered  table-member">
+									<tbody>
+										<tr>
+
+											<td><strong>विवरण दिने : </strong> <span
+												th:text="${residentFullDetail.residentDetail.answer1}">
+											</span></td>
+											<td><strong>मिति : </strong><span
+												th:text="${residentFullDetail.residentDetail.entryDate}"></span></td>
+											<td><strong>तथ्यांक संकलन : </strong> <span
+												th:text="${residentFullDetail.surveyor}"></span></td>
+
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+					<!-- Tabbed Layout -->	
+				
+				<div class="display-form-visible print table-responsive printForm">
+					<div class="data-heading-row">
+						<div class="row">
+							<div class="col-lg-2 col-md-12">
+								<a th:href="${residentFullDetail.residentDetail.answer51}"
+									style="display: block" target="_blank" class="no-pjax"><img
+									th:src="${residentFullDetail.residentDetail.answer51}"
+									class="media-object house-detail-photo"
+									style="width: 150px; height: 150px;"></a>
+							</div>
+							<div class="col-lg-10 col-md-12">
+								<table class="table">
+									<tbody>
+										<tr>
+											<td><strong>घरमुलीको नाम</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer1}"></td>
+											<td><strong>टोल</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer2}"></td>
+											<td><strong>घर नं</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer4}"></td>
+											<td><strong>फोन नं</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer5}"></td>
+										</tr>
+										<tr>
+											<td><strong>बुबाको नाम</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer6}">दुर्गा
+												बहादुर राउत</td>
+											<td><strong>आमाको नाम</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer7}">कान्छी
+												राउत</td>
+											<td><strong>जाति</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer9}">ब्रहमण/क्षेत्री</td>
+											<td><strong>धर्म</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer10}">हिन्दू
+												धर्म</td>
+										</tr>
+										<tr>
+											<td><strong>पुर्खोली भाषा</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer8}">नेपाली</td>
+											<td><strong>पहिलो भाषा</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer98}">नेपाली</td>
+											<td><strong>दोस्रो भाषा</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer99}">नेपाली</td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td><strong>नागरिकता नं</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer11}">१३/१६४१</td>
+											<td><strong>नागरिकता लिएको जिल्ला</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer12}">ललितपुर</td>
+											<td><strong>स्थायी ठेगाना</strong> :</td>
+											<td th:text="${residentFullDetail.residentDetail.answer74}"></td>
+											<td></td>
+											<td></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-12 col-md-12">
+							<div class="table-responsive">
+								<table class="table table-striped table-hover table-member"
+									id="grid"
+									th:if="${residentFullDetail.familyMembers != null && #lists.size(residentFullDetail.familyMembers) > 0}">
+									<thead>
+										<tr>
+											<th rowspan="2"><strong>ऋ.स</strong></th>
+											<th><strong>१</strong></th>
+											<th><strong>२</strong></th>
+											<th><strong>३</strong></th>
+											<th><strong>४</strong></th>
+											<th><strong>५</strong></th>
+											<th><strong>६</strong></th>
+											<th><strong>७</strong></th>
+											<th><strong>८</strong></th>
+											<th><strong>९</strong></th>
+											<th><strong>१० </strong></th>
+											<th rowspan="2" class="rm-print"><strong>#</strong></th>
+										</tr>
+										<tr>
+											<th><strong>नाम थर</strong></th>
+											<th><strong>नाता</strong></th>
+											<th><strong>लिङ्ग</strong></th>
+											<th><strong>उमेर</strong></th>
+											<th><strong>वैवाहिक<br> स्थिति
+											</strong></th>
+											<th><strong>सैक्षिक योग्येता</strong></th>
+											<th><strong>पेशा</strong></th>
+											<th><strong>मतदाता<br> परिचयपत्र
+											</strong></th>
+											<th><strong>स्वास्थ्य अवस्था</strong></th>
+											<th sec:authorize="hasAnyRole('CENTRAL_ADMIN', 'WARD_ADMIN', 'SURVEYOR')"><strong>कार्यहरू</strong></th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr
+											th:each="member,iteration: ${residentFullDetail.familyMembers}">
+											<td th:text="${iteration.index + 1}">1</td>
+											<td th:text="${member.name}"></td>
+											<td th:text="${member.relation}"></td>
+											<td th:text="${member.gender}"></td>
+											<td th:text="${member.age}"></td>
+											<td th:text="${member.maritalStatus}"></td>
+											<td th:text="${member.education}"></td>
+											<td th:text="${member.occupation}"></td>
+											<td th:text="${member.voterCard} == 'true' ? 'छ' : 'छैन'"></td>
+											<td th:text="${member.healthCondition}"></td>
+											<td sec:authorize="hasAnyRole('CENTRAL_ADMIN', 'WARD_ADMIN', 'SURVEYOR')"><a href="#"
+												th:href="@{/resident/member/} + ${member.memberId}"
+												class="btn btn-xs btn-success">Edit Details</a>
+												<button
+													sec:authorize="hasAnyRole('CENTRAL_ADMIN', 'WARD_ADMIN', 'SURVEYOR')"
+													class="btn btn-xs btn-warning"
+													th:attr="onclick=|deleteMemberInfo('${member.memberId}')|">
+													Delete</button> <a href="#" th:data="${member.memberId}"
+												class="btn btn-xs btn-danger">Mark Demise</a>
+											<td>
+										</tr>
+									</tbody>
+								</table>
+								<table
+									th:if="${residentFullDetail.familyMembers == null || #lists.isEmpty(residentFullDetail.familyMembers)}">
+									<thead>
+										<tr>
+											<td><h2>माफ गर्नुहोला | परिवारको कुनै पनि सदस्य
+													भेटीएन वा प्रणालीमा बिवरण राखिएको छैन |</h2></td>
+										</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+
+						<!-- Try1 -->
+						<!--Panel-->
+						<div class="card col-12 col-lg-12">
+							<div class="card-header">
+								<!--Tabs-->
+								<ul id="bctabs" class="nav nav-pills card-header-pills"
+									role="tablist">
+									<li th:each="questonTypeTab, i : ${qustionTypeTabs}" class="nav-item"><a
+										th:id="'tab-' + ${qustionTypeTabs[i.index]}" th:class="'nav-link ' + ${i.index == 0 ? 'active' : ''}"
+										data-toggle="tab" role="tab"
+										th:href="'#' + ${qustionTypeTabs[i.index]} + '-tab-content'"> <span
+											th:text="${qustionTypeTabsWithSpacing[i.index]}"></span>
+									</a></li>
+
+								</ul>
+								<!--/.Tabs-->
+							</div>
+
+							<div class="card-body">
+								<div class="tab-content bc-card-tabs" id="bctabs-content">
+
+									<div class="tab-pane fade show active"
+										th:id="${qustionTypeTabs[0]} + '-tab-content'" role="tabpanel">
+
+
+										<div class="col-lg-12 col-md-12">
+											<div class="table-responsive">
+												<table class="table table-striped table-member">
+													<tbody>
+														<tr>
+															<td>१३. <strong>कित्ता नं </strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer13}"></span></td>
+															<td>१४. <strong>घर संख्या</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer14}"></span></td>
+															<td>१५. <strong>घरको तल्ला</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer18}"></span></td>
+
+
+														</tr>
+														<tr>
+															<td>१६. <strong>घरको छानाको प्रकार</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer22}"></span></td>
+															<td>१७. <strong>घरको जगको प्रकार</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer23}"></span></td>
+															<td>१८. <strong>व्यवसायको नाम</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer15}"></span></td>
+
+														</tr>
+														<tr>
+															<td>१९. <strong>व्यवसायीको नाम</strong>:
+																<span th:text="${residentFullDetail.residentDetail.answer16}"></span></td>
+															<td>२०. <strong>व्यवसायको किसिम</strong>:
+																<span th:text="${residentFullDetail.residentDetail.answer97}"></span></td>
+															<td>२१. <strong>व्यवसायीको फोन नं</strong>: 
+																<span th:text="${residentFullDetail.residentDetail.answer17}"></span></td>
+															
+														</tr>
+														<tr>
+															<td>२२. <strong>खानेपानीको स्रोत</strong>:
+																<span
+																th:text="${residentFullDetail.residentDetail.answer19}"></span>
+															</td>
+															<td>२३. <strong>निकास</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer20}"></span>
+															</td>
+															<td>२४. <strong>बत्ती</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer36}"></span>
+															</td>
+														</tr>
+														<tr>
+															<td>२५. <strong>सवारी साधन</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer21}"></span></td>
+															<td>२६. <strong>वैदेशिक रोजगार</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer32}"></span>
+															</td>
+															<td>२७. <strong>वैदेशिक अध्ययन</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer33}"></span>
+															</td>
+															
+														</tr>
+														<tr>
+															<td>२८. <strong>खाना पकाउन पर्योग हुने
+																	इन्धन</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer37}"></span>
+															</td>
+															<td>२९. <strong>घरबाट उत्पादन भएको फोहोरको
+																	ब्यबस्था </strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer35}"></span>
+															</td>
+															<td>३०. <strong>चर्पी</strong>: 
+																<span
+																th:text="${residentFullDetail.residentDetail.answer95}"></span>
+															</td>
+														</tr>
+														<tr>
+															<td>३१. <strong>सञ्चार सुविधा</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer38}"></span>
+															</td>
+															<td>३२. <strong>घर जग्गाको विवरण</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer39}"></span>
+															</td>
+															<td>३३. <strong>अन्य सुविधाहरु</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer96}"></span></td>
+														</tr>
+														<tr>
+															<td>३४. <strong>वार्षिक आम्दानी</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer40}"></span>
+															</td>
+															<td>३५. <strong>वार्षिक खर्च</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer41}"></span>
+															</td>
+														</tr>
+														<tr>
+															<td>३६. <strong>आफ्नो उत्पादन तथा आय
+																	स्रोतले कति महिना खान पुग्छ?</strong>: <span
+																th:text="${residentFullDetail.residentDetail.answer43}"></span>
+															</td>
+
+														</tr>
+
+													</tbody>
+												</table>
+											</div>
+										</div>
+
+
+									</div>
+
+
+									<!-- 2nd tab -->
+
+									<div class="tab-pane fade show"
+										th:id="${qustionTypeTabs[1]} + '-tab-content'" role="tabpanel">
+
+										<div class="col-lg-12 col-md-12">
+											<div class="table-responsive">
+												<table class="table table-striped table-member">
+													<tbody>
+														<tr>
+															<td>३७. <strong>घर भुकम्प प्रतिरोधात्मक</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer24}"></td>
+														</tr>
+														<tr>
+															<td>३८. <strong>तपाईको घर वा परिवारलाई २०७२
+																	सालको भुकम्पले के-कस्तो क्षेती पुर्यायो?</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer25}"></td>
+														</tr>
+														<tr>
+															<td>३९. <strong>घर क्षती भएको भए पुनः
+																	निर्माण गर्नु भयो?</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer26}"></td>
+														</tr>
+														<tr>
+															<td>४०. <strong>तपाईको घर परिवारलाई अहिले
+																	कुनै प्रकारको जोखिम छ?</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer27}"></td>
+														</tr>
+
+														<tr>
+															<td>४१. <strong>जोखिमको समयमा सबैभन्दा
+																	पहिलो उद्धार कसले गरेको थियो? </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer28}"></td>
+														</tr>
+														<tr>
+															<td>४२. <strong>पछिल्लो ५ वर्षमा तपाईको घर
+																	परिवारले कस्तो किसिमका जोखिम सामना गर्नु पर्यो? </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer29}"></td>
+														</tr>
+														<tr>
+															<td>४३. <strong>तपाईको विचारमा यस क्षेत्रमा
+																	तलका मध्ये कुन-कुन जोखिमको खतरा उच्च छ? <br> (१
+																	देखि ७ सम्म स्तरीकरण गर्नुहोस्। १ लाई उच्च र ७ लाई
+																	न्युन जोखिम मान्नुहोस्)
+															</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer30}"></td>
+														</tr>
+														<tr>
+															<td>४४. <strong>भविष्यमा हुन सक्ने जोखिम
+																	नियन्त्रणको लागि के-कस्तो पुर्व तयारी गर्नु भएको छ?</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer31}"></td>
+														</tr>
+
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+
+									<!-- 2nd tab ends -->
+
+									<!-- 3rdd tab -->
+
+									<div class="tab-pane fade show"
+										th:id="${qustionTypeTabs[2]} + '-tab-content'" role="tabpanel">
+
+										<div class="col-lg-12 col-md-12">
+											<div class="table-responsive">
+												<table class="table table-striped table-member">
+													<tbody>
+														<tr>
+															<td>४५. <strong>१६ वर्ष सम्मका बालबालिका
+																	अन्य ठाँउमा काम गर्न गएका छन्?</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer34}"></td>
+														
+														</tr>
+
+														<tr>
+															<td>४६. <strong>तपाईको परिवारमा १८
+																	वर्षभन्दा कम उमेरका भिन्न <br> शारीरिक तथा मानसिक
+																	क्षमता भएका(अपाङ्ग) सदस्यहरु (बालक)
+															</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer52}"></td>
+														
+														</tr>
+														<tr>
+															<td>४७. <strong>तपाईको परिवारमा १८
+																	वर्षभन्दा कम उमेरका भिन्न <br> शारीरिक तथा मानसिक
+																	क्षमता भएका(अपाङ्ग) सदस्यहरु (बालिका)
+															</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer53}"></td>
+														
+														</tr>
+														<tr>
+															<td>४८. <strong>परिवारको कुनै सदस्य विरामी
+																	भएमा उपचारका लागि सबैभन्दा पहिला कहाँ जानुहुन्छ?</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer54}"></td>
+														
+														</tr>
+														<tr>
+															<td>४९. <strong>बिचैमा विद्यालय जान छोडेका
+																	६ - १५ वर्ष उमेर समुहका बालबालिकाहरुका संख्या</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer55}"></td>
+														
+														</tr>
+														<tr>
+															<td>५०. <strong>बाल विकास केन्द्र वा पुर्व
+																	प्रा.वि. तहमा जाने ३ देखि ५ वर्षसम्मका बालबालिका संख्या</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer56}"></td>
+														
+														</tr>
+														<tr>
+															<td>५१. <strong>तपाईको परिवारमा बालबालिकाले
+																	गल्ति गरेमा के गर्नु हुन्छ?</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer57}"></td>
+														
+														</tr>
+														<tr>
+															<td>५२. <strong>तपाईको परिवारका कुनै
+																	बालबालिका सडक बालबालिकाको रुपमा रहेका छन्?</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer58}"></td>
+														
+														</tr>
+														<tr>
+															<td>५३. <strong>तपाईको परिवारका बालबालिका
+																	पढ्ने विद्यालायमा भिन्न <br> शारीरिक क्षमता भएका
+																	विद्यार्थीका लागि विशेष शिक्षाको सुविधा छ?
+															</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer59}"></td>
+														
+														</tr>
+														<tr>
+															<td>५४. <strong>एक वर्षभित्र तपाईको
+																	परिवारमा महिला तथा बालबालिका <br> उपर हिंसा
+																	सम्बन्धी निम्न कुनै घटना घटेका छन/छैनन्?
+															</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer60}"></td>
+														
+														</tr>
+														<tr>
+															<td>५५. <strong>बितेको १ वर्षभित्र तपाईको
+																	परिवारमा ५ वर्षमुनिका <br> कुनै बालबालिकाको मृत्यु
+																	भएको छ?
+															</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer61}"></td>
+														
+														</tr>
+
+
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+
+									<!-- 3rd tab ends -->
+
+
+									<!-- 4th tab -->
+
+									<div class="tab-pane fade show"
+										th:id="${qustionTypeTabs[3]} + '-tab-content'" role="tabpanel">
+
+										<div class="col-lg-12 col-md-12">
+											<div class="table-responsive">
+												<table class="table table-striped table-member">
+													<tbody>
+														<tr>
+															<td>५६. <strong>व्यवसाय फार्मको नाम </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer75}"></td>
+														
+														</tr>
+														<tr>
+															<td>५७. <strong>व्यवसाय फार्म दर्ता गरेको छ
+																	वा छैन </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer76}"></td>
+														
+														</tr>
+														<tr>
+															<td>५८. <strong>बाली बिमा गरेको छ वा छैन </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer77}"></td>
+														
+														</tr>
+														<tr>
+															<td>५९. <strong>कृषि गर्न प्रयोग भएको जग्गा
+															</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer78}"></td>
+														
+														</tr>
+														<tr>
+															<td>६०. <strong>व्यवसाय फार्म कुनै समुहमा
+																	आवद्ध भएको </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer79}"></td>
+														
+														</tr>
+														<tr>
+															<td>६१. <strong>खाद्दान्न बाली</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer80}"></td>
+														
+														</tr>
+														<tr>
+															<td>६२. <strong>नगदे बाली</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer81}"></td>
+														
+														</tr>
+														<tr>
+															<td>६३. <strong>दह बाली</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer82}"></td>
+														
+														</tr>
+														<tr>
+															<td>६४. <strong>फलफुल</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer83}"></td>
+														
+														</tr>
+														<tr>
+															<td>६५. <strong>तरकारी बाली</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer84}"></td>
+														
+														</tr>
+														<tr>
+															<td>६६. <strong>अन्य बाली (पुष्प खेति,
+																	च्याउ)</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer85}"></td>
+														
+														</tr>
+														<tr>
+															<td>६७. <strong>बेमौसमी खेति गरिऐको बालिको
+																	नाम </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer86}"></td>
+														
+														</tr>
+														<tr>
+															<td>६८. <strong>प्लाष्टिक घर बनाएको(छ भने
+																	सङ्ख्या) </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer87}"></td>
+														
+														</tr>
+														<tr>
+															<td>६९. <strong>बेमौसमी खेति गरिएको जग्गा </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer88}"></td>
+														
+														</tr>
+														<tr>
+															<td>७०. <strong>मौरीपालन गर्नु भएको छ? (भए
+																	मौरीघार कति) </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer89}"></td>
+														
+														</tr>
+														<tr>
+															<td>७१. <strong>मौरीपालन कुन जातको</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer90}"></td>
+														
+														</tr>
+														<tr>
+															<td>७२. <strong>वार्षिक मह उत्पादन (के.जी)
+															</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer91}"></td>
+														
+														</tr>
+														<tr>
+															<td>७३. <strong>काम गर्ने कर्मचारीहरु कति
+																	छन ?</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer92}"></td>
+														
+														</tr>
+														<tr>
+															<td>७४. <strong>कृषि गर्नको लागि बार्षिक
+																	खर्च कति लाग्छ? </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer44}"></td>
+														
+														</tr>
+														<tr>
+															<td>७५. <strong>कृषिबाट बार्षिक आम्दानी कति
+																	जति हुन्छ?</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer45}"></td>
+														
+														</tr>
+
+
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+
+									<!-- 4th tab ends -->
+
+
+									<!-- 5th tab -->
+
+									<div class="tab-pane fade show"
+										th:id="${qustionTypeTabs[4]} + '-tab-content'" role="tabpanel">
+
+										<div class="col-lg-12 col-md-12">
+											<div class="table-responsive">
+												<table class="table table-striped table-member">
+													<tbody>
+														<tr>
+															<td>७६. <strong>पशुपन्छी पालेकोः </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer62}"></td>
+														
+														</tr>
+														<tr>
+															<td>७७. <strong>व्यवसाय दर्ता भएको</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer63}"></td>
+														
+														</tr>
+														<tr>
+															<td>७८. <strong>चौपाया तथा पशुपंक्षी</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer42}"></td>
+														
+														</tr>
+														<tr>
+															<td>७६. <strong>पशुपन्छी पालनको किसिम</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer64}"></td>
+														
+														</tr>
+														<tr>
+															<td>७९. <strong>पशुपन्छीलाई रोग विरुद्ध खोप
+																	लगाउनु भएको </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer65}"></td>
+														
+														</tr>
+														<tr>
+															<td>८०. <strong>पशुपन्छी पालन समुह आवद्धता</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer66}"></td>
+														
+														</tr>
+														<tr>
+															<td>८१. <strong>व्यवसाय गर्न प्रयोग भएको
+																	जग्गाको विवरणः </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer67}"></td>
+														
+														</tr>
+														<tr>
+															<td>८२. <strong>गोठको प्रकार</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer68}"></td>
+														
+														</tr>
+														<tr>
+															<td>८३. <strong>पशुपन्छीलाई आवश्यक
+																	खाद्यान्न </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer69}"></td>
+														
+														</tr>
+														<tr>
+															<td>८४. <strong>काम गर्ने कर्मचारीहरु </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer70}"></td>
+														
+														</tr>
+														<tr>
+															<td>८५. <strong>पशुपन्छी पालनमा जम्मा
+																	वार्षिक खर्च </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer71}"></td>
+														
+														</tr>
+														<tr>
+															<td>८६. <strong>पशुपन्छी पालनबाट वार्षिक
+																	आम्दानी</strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer72}"></td>
+														
+														</tr>
+														<tr>
+															<td>८७. <strong>पशु बिमा गर्नुभएको </strong>:
+															</td>
+															<td
+																th:text="${residentFullDetail.residentDetail.answer73}"></td>
+														
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+
+									<!-- 5th tab ends -->
+
+									<!-- 6th tab -->
+
+									<div class="tab-pane fade show"
+										th:id="${qustionTypeTabs[5]} + '-tab-content'" role="tabpanel">
+
+										<div class="col-lg-12 col-md-12">
+											<div class="table-responsive">
+												<table class="table table-bordered  table-member">
+													<tbody>
+														<tr>
+															<td><strong>कागजातहरू</strong>:</td>
+															<td><span>नागरिकता</span><a
+																th:href="${residentFullDetail.residentDetail.answer46}"
+																target="blank"><img
+																	th:src="${residentFullDetail.residentDetail.answer46}"
+																	style="display: block; height: 300px; width: 300px"
+																	class="img-thumbnail photo"
+																	th:onerror="'this.src=\'' + @{/assets/images/no-image.png} + '\';'"></a></td>
+															<td><span>नाता प्रमाण-पत्र</span><a
+																th:href="${residentFullDetail.residentDetail.answer47}"
+																target="blank"><img
+																	th:src="${residentFullDetail.residentDetail.answer47}"
+																	style="display: block; height: 300px; width: 300px"
+																	class="img-thumbnail photo"
+																	th:onerror="'this.src=\'' + @{/assets/images/no-image.png} + '\';'"></a></td>
+															<td><span>पास भएको घरको नक्सा</span><a
+																th:href="${residentFullDetail.residentDetail.answer48}"
+																target="blank"><img
+																	th:src="${residentFullDetail.residentDetail.answer48}"
+																	style="display: block; height: 300px; width: 300px"
+																	class="img-thumbnail photo"
+																	th:onerror="'this.src=\'' + @{/assets/images/no-image.png} + '\';'"></a></td>
+															<td><span>अन्य कागजात</span><a
+																th:href="${residentFullDetail.residentDetail.answer49}"
+																target="blank"><img
+																	th:src="${residentFullDetail.residentDetail.answer49}"
+																	style="display: block; height: 300px; width: 300px"
+																	class="img-thumbnail photo"
+																	th:onerror="'this.src=\'' + @{/assets/images/no-image.png} + '\';'"></a></td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+
+									<!-- 6th tab ends -->
+
+								</div>
+							</div>
+						</div>
+						<!-- Try1 ends -->
+
+					</div>
+					<div class="row">
+						<div class="col-lg-12 col-md-12">
+							<div class="table-responsive">
+								<table class="table table-bordered  table-member">
+									<tbody>
+										<tr>
+
+											<td><strong>विवरण दिने : </strong> <span
+												th:text="${residentFullDetail.residentDetail.answer1}">
+											</span></td>
+											<td><strong>मिति : </strong><span
+												th:text="${residentFullDetail.residentDetail.entryDate}"></span></td>
+											<td><strong>तथ्यांक संकलन : </strong> <span
+												th:text="${residentFullDetail.surveyor}"></span></td>
+
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Modal View For Map Location Display-->
+				<div class="modal fade" id="map-location-modal"
+					data-keyboard="false" data-backdrop="false" role="dialog"
+					aria-hidden="true">
+					<div class="modal-dialog modal-lg modal-dialog-centered"
+						role="document">
+						<div class="modal-content" style="border-radius: 10px;">
+							<div class="modal-header">
+								<h5 class="modal-title">
+									<b><span
+										th:text=${residentFullDetail.residentDetail.answer1}></span>
+										को बासस्थान|</b>
+								</h5>
+								<button id="cancel-location-btn"
+									class="btn btn-danger pull-right">
+									<b>X</b>
+								</button>
+							</div>
+							<div class="modal-content-body">
+								<div class="row">
+									<!-- 								<div class="row" style="margin: 5px 20px;"> -->
+									<!-- 									<div style="margin: 20px auto;"> -->
+									<div>
+										<div id="surveyMap"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 				<div class="btn-print"> -->
+				<!-- 					<button id="print" class="btn btn-primary">Print this page</button> -->
+				<!-- 				</div> -->
+
+				<div class="modal fade" id="deth-record-modal" data-keyboard="false"
+					data-backdrop="false" role="dialog" aria-hidden="true">
+					<div class="modal-dialog modal-lg modal-dialog-centered"
+						role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">Death Record.</h5>
+							</div>
+							<div class="modal-body">
+								<form>
+									<input type="hidden" id="memberId" name="memberId" />
+									<div class="form-group">
+										<label for="regNumber" class="control-label">Registration Number</label>
+										<div class="row">
+											<div class="col-md-6">
+												<input type="text" class="form-control" id="regNumber">
+											</div>
+											<div class="col-md-4">
+												<button class=" btn btn-success" id="regCodeBtn">Generate Code</button>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="deathCause" class="control-label">Death Cause</label>
+										<input type="text" class="form-control" id="deathCause">
+									</div>
+									<div class="form-group">
+										<label for="date" class="control-label">Date</label>
+										<input type="date" class="form-control" id="date" />
+									</div>
+									<div class="form-group">
+										<label for="place" class="control-label">Place</label>
+										<input type="text" class="form-control" id="place">
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">Close</button>
+								<button type="button" id="death-record-submit-btn" class="btn btn-primary">Submit</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<footer th:replace="~{fragments/footer :: footer}"></footer>
+	</div>
+	<div th:replace="~{fragments/scripts :: scripts}"></div>
+	<script th:src="@{/assets/js/leaflet.js}"></script>
+	<script th:src="@{/assets/js/printThis.js}"
+		src="assets/js/printThis.js"></script>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var geoCoordinates = /*[[${residentFullDetail.residentDetail.answer50}]]*/'0';
+
+		/*]]>*/
+		
+			/*<![CDATA[*/
+			var residentFullDetail = /*[[${residentFullDetail}]]*/'';
+			
+			/*]]>*/
+		var token = /*[[${#authentication.principal.token}]]*/ '';
+		$(function() {
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$(document).ajaxSend(function(e, xhr, options) {
+				xhr.setRequestHeader(header, token);
+			});
+		});
+		
+
+		
+		//Splitting the location coordinates into latitude and longitude
+		var geoFields = geoCoordinates.split(', ');
+
+		var geoLat = geoFields[0]; //Gets the latitude
+		var geoLong = geoFields[1]; //Gets the longitude
+
+		if(geoLong === undefined) {
+			$("#view-location-btn").prop("disabled",true);
+			$("#view-location-btn").removeClass("btn-success").addClass("btn-danger");
+			geoLat = 0;
+			geoLong = 0;
+		} else {
+			$("#view-location-btn").prop("disabled",false);
+			$("#view-location-btn").removeClass("btn-danger").addClass("btn-success");
+		}
+		
+		
+		//JS function for displaying the location of the household using leafletjs
+		const mymap = L.map('surveyMap').setView([ geoLat, geoLong ], 20);
+		var marker;
+		// 			var layerGroup = L.layerGroup().addTo(mymap);
+
+		const attribution = '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors';
+
+		//			const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+		// 			const tiles = L.tileLayer(tileUrl, {attribution});
+		// 			tiles.addTo(mymap);
+
+		L.tileLayer('http://{s}.google.com/vt/lyrs=y,h&x={x}&y={y}&z={z}', {
+			attribution : 'Map data &copy; 2020 Google',
+			maxZoom : 20,
+			subdomains : [ 'mt0', 'mt1', 'mt2', 'mt3' ]
+		}).addTo(mymap);
+
+		marker = L.marker([ geoLat, geoLong ]).addTo(mymap).bindPopup("Record ID = " + residentFullDetail.residentDetail.filledId);
+
+		
+		//For showing the Map modal	
+		$("#view-location-btn").on("click", function(event) {
+			event.preventDefault();
+			$("#map-location-modal").modal("show");
+			setTimeout(function() {
+				mymap.invalidateSize();
+			}, 20)
+		});
+
+		//For canceling and hiding the Map modal
+		$("#cancel-location-btn").on("click", function(event) {
+			$("#map-location-modal").modal("hide");
+		});
+
+		//Prints the resident details
+		$(function() {
+			$('#print').click(function() {
+				$('.saibu-display-form').printThis({
+					importCSS : false,
+					loadCSS : "/assets/css/print.css",
+					removeInline : true
+				});
+			});
+		});
+		
+		//converts date to mm-dd-yyyy form
+		function convertDate(rawDate) {
+			let date = rawDate.split("/");
+			let arrayLength = date.length;
+			let finalDate = "";
+			for(let i = 0; i < arrayLength; i++) {
+				if(i == (arrayLength -1)) {
+					finalDate += date[i];
+				} else {
+					finalDate += date[i] + "-";
+				}
+			}
+			return finalDate;
+		}
+		
+		//Set death record request
+		$("#grid td").on('click', "a", function(event) {
+			if($(this).text() === 'Mark Demise') {
+				let memberId = $(this).attr("data") || false;
+				$("#memberId").val(memberId);
+				$("#deth-record-modal").modal("show");
+			}
+		});
+		
+		$("#death-record-submit-btn").on("click", function(event) {
+			event.preventDefault();
+			var memberId = $("#memberId").val();
+			var registrationNumber = $("#regNumber").val();
+			var deathCause =  $("#deathCause").val();
+			var demiseDate =  $("#date").val();
+			var place =  $("#place").val();
+			
+			let deathRecord = {};
+			deathRecord.memberId = memberId;
+			deathRecord.registrationNumber = registrationNumber;
+			deathRecord.deathCause = deathCause;
+			deathRecord.demiseDate = convertDate(demiseDate);
+			deathRecord.place = place;
+			
+			$.ajax({
+				url: "http://localhost:8888/resident/member/dead",
+				method: "POST",
+				contentType: "Application/Json",
+				headers: {
+					"Authorization": token
+				},
+				data: JSON.stringify(deathRecord),
+				success: function(data) {
+					swal.fire({
+						  text: "Member marked as demise!",
+						  icon: "success",
+						  buttons: true,
+						  dangerMode: true,
+						})
+						.then((willDelete) => {
+						 location.reload();
+					});
+				},
+				error: function(data) {
+					console.log(data);
+				}
+			});
+		});
+		
+		//For canceling and hiding the Map modal
+		$("#deth-record-cancel").on("click", function(event) {
+			$("#deth-record-modal").modal("hide");
+		});
+		
+		
+		//Generate Random Code For Registration.
+		function generatePassword() {
+			return (Math.random().toString(36).slice(2)
+					+ Math.random().toString(36).toUpperCase().slice(2)).toUpperCase();
+		}
+		
+		$("#regCodeBtn").on("click", function(event) {
+			event.preventDefault();
+			$("#regNumber").val(generatePassword());
+		});
+		
+		// For deleting favPlace
+		function deleteMemberInfo(memberId) {
+			swal.fire({
+				title : 'Are you sure you want to delete this member?',
+				text : "You won't be able to revert this!",
+				icon : 'warning',
+				showCancelButton : true,
+				confirmButtonColor : '#3085d6',
+				cancelButtonColor : '#d33',
+				confirmButtonText : 'Yes, delete it!'
+			}).then((btnClicked) => {
+				if(btnClicked.value) {
+					swal.fire({
+						title : 'Are you sure absolutely sure?',
+						text : "This action cannot be reverted!",
+						icon : 'warning',
+						showCancelButton : true,
+						confirmButtonColor : '#3085d6',
+						cancelButtonColor : '#d33',
+						confirmButtonText : 'Yes, delete it!'
+					}).then((btnClicked) => {
+						if(btnClicked.value) {
+							$.ajax({
+								url : contextPath + "/resident/" + memberId,
+								method : "DELETE",
+								success : function(data) {
+									swal.fire({
+										icon : "success",
+										text : "The family member has been removed"
+									}).then((btnClick) => {
+										if(btnClick.value) {
+											location.reload(true);		
+										}
+									});
+								}
+							});
+						}
+					});
+				}
+			});
+		}
+		
+		function onGoBackButtonClick(event){
+			//event.preventDefault();
+			//event.stopPropagation();
+			console.log("Yes Back!!")
+			
+			var urlObj = getParams(window.location.href);
+			
+			var url = '';
+			
+			
+			if(urlObj.parentHTML === 'res-data'){
+				 url = contextPath + "/resident?" ;
+				console.log("Need to go back to Resident data")
+					if(urlObj.prevLastItemId){
+						url += "prevLastItemId=" + urlObj.prevLastItemId + "&";
+					}
+					if(urlObj.lastSeenId){
+						url += "lastSeenId=" + urlObj.lastSeenId+"&";
+					}
+				
+				if(urlObj.searchKey){
+					url += "searchKey=" + urlObj.searchKey + "&";
+				}
+				if(urlObj.wardNo){
+					url += "wardNo=" + urlObj.wardNo + "&";
+				}
+				
+				if(urlObj.toleName){
+					url += "toleName=" + urlObj.toleName + "&";
+				}
+				
+				if(urlObj.sortBy){
+					url += "sortBy=" + urlObj.sortBy + "&";
+					url += "sortByOrder=" + urlObj.sortByOrder + "&";
+				}
+				if(urlObj.currentPage)
+				url += "currentPage=" + urlObj.currentPage + "&";
+				
+				if(urlObj.pageLimit)
+				url += "pageLimit=" + urlObj.pageLimit + "&";
+				
+				url += "backFrom=" + "res-details" + "&";
+				
+				
+				window.location.href = url;
+			}else if(urlObj.parentHTML === 'member-data'){
+				 url = contextPath + "/member?" ;
+				console.log("Need to go back to Member data")
+				
+				if(urlObj.prevLastItemId){
+					url += "prevLastItemId=" + urlObj.prevLastItemId + "&";
+				}
+			
+			if(urlObj.searchKey){
+				url += "searchKey=" + urlObj.searchKey + "&";
+			}
+			if(urlObj.wardNo){
+				url += "wardNo=" + urlObj.wardNo + "&";
+			}
+			
+			if(urlObj.sortBy){
+				url += "sortBy=" + urlObj.sortBy + "&";
+				url += "sortByOrder=" + urlObj.sortByOrder + "&";
+			}
+			if(urlObj.currentPage)
+			url += "currentPage=" + urlObj.currentPage + "&";
+			
+			if(urlObj.pageLimit)
+			url += "pageLimit=" + urlObj.pageLimit + "&";
+			
+			url += "backFrom=" + "res-details" + "&";
+			
+			
+			window.location.href = url;
+			}
+			
+		}
+		
+		$("#goBackButton").on("click", (event)=>onGoBackButtonClick(event));
+		//$("#goBackButton1").on("click", (event)=>onGoBackButtonClick(event));
+		
+		
+		var getParams = function (url) {
+			var params = {};
+			var parser = document.createElement('a');
+			parser.href = url;
+			var query = parser.search.substring(1);
+			var vars = query.split('&');
+			for (var i = 0; i < vars.length; i++) {
+				var pair = vars[i].split('=');
+				params[pair[0]] = decodeURIComponent(pair[1]);
+			}
+			return params;
+		};
+	</script>
+</body>
+</html>

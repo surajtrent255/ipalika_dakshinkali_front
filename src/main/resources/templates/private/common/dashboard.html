@@ -1,0 +1,2777 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+<title>दक्षिणकाली नगरपालिका</title>
+<!--favicon-->
+<link rel="icon" th:href="@{/assets/images/favicon1.ico}"
+	href="assets/images/favicon1.ico" type="image/x-icon" />
+<link th:href="@{/assets/plugins/vectormap/jquery-jvectormap-2.0.2.css}"
+	href="assets/plugins/vectormap/jquery-jvectormap-2.0.2.css"
+	rel="stylesheet" />
+<link th:href="@{/assets/plugins/simplebar/css/simplebar.css}"
+	href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+<link th:href="@{/assets/css/bootstrap.min.css}"
+	href="assets/css/bootstrap.min.css" rel="stylesheet" />
+<link th:href="@{/assets/css/animate.css}" href="assets/css/animate.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/icons.css}" href="assets/css/icons.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/sidebar-menu.css}"
+	href="assets/css/sidebar-menu.css" rel="stylesheet" />
+<link th:href="@{/assets/css/app-style.css}"
+	href="assets/css/app-style.css" rel="stylesheet" />
+</head>
+<body>
+
+	<!-- Start wrapper-->
+	<div id="wrapper">
+		<div th:replace="~{fragments/private-sidebar :: private-sidebar}"></div>
+		<header th:replace="~{fragments/header :: header}" class="header1">
+		</header>
+		<div class="clearfix"></div>
+		<div class="content-wrapper">
+			<div class="container-fluid">
+				<button
+					sec:authorize="hasAnyRole('CENTRAL_ADMIN', 'WARD_ADMIN', 'SURVEYOR')"
+					class="btn btn-xs btn-primary" th:attr="onclick=|generateReport()|">Generate
+					Latest Report</button>
+				<div class="col-md-3">
+					<div class="ui" sec:authorize="hasAnyRole('CENTRAL_ADMIN')">
+						<label>Ward&nbsp; <select id="ward-wise-select"
+							class="ui input">
+								<option value="0"></option>
+								<option th:value="${indx.index} + 1"
+									th:each="option, indx : ${wards}" th:text="${option}"></option>
+						</select>
+						</label>
+					</div>
+					<div class="ui"
+						sec:authorize="hasAnyRole('WARD_ADMIN', 'SURVEYOR') && !hasAnyRole('CENTRAL_ADMIN')">
+						<label>Ward&nbsp; <select id="ward-wise-select"
+							class="ui input">
+								<!-- <option value=""></option> -->
+								<option th:value="${loggedInUserWard}"
+									th:text="${loggedInUserWard}"></option>
+						</select>
+						</label>
+					</div>
+				</div>
+
+
+
+				<!--Start Dashboard Content-->
+				
+				<!--Age wise population starts-->
+				<div th:if="${populationReport != null}" class="row mt-3">
+					<div class="col-12 col-lg-6 col-xl-2">
+						<div class="card gradient-deepblue">
+							<div class="card-body">
+								<h5 class="text-white mb-0"
+									th:text="${populationReport.get(0).option1}">9526</h5>
+								<div class="progress my-3" style="height: 3px;">
+									<div class="progress-bar"
+										th:style="${'width:' + (populationReport.get(0).option1/populationReport.get(0).total)*100 + '%;'}"
+										style="width: 55%"></div>
+								</div>
+								<p class="mb-0 text-white small-font">
+									शिशु (०-५)<span th:if="${populationReport.get(0).option1} == 0"
+										class="float-right"
+										th:text="${(populationReport.get(0).option1/populationReport.get(0).total)*100 + '%'}">
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</span> <span th:unless="${populationReport.get(0).option1} == 0"
+										class="float-right"
+										th:text="${#numbers.formatDecimal(((populationReport.get(0).option1/populationReport.get(0).total)*100), 1, 'COMMA', 2, 'POINT') +'%'}">25%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-6 col-xl-2">
+						<div class="card gradient-orange">
+							<div class="card-body">
+								<h5 class="text-white mb-0"
+									th:text="${populationReport.get(0).option2}">8323</h5>
+								<div class="progress my-3" style="height: 3px;">
+									<div class="progress-bar"
+										th:style="${'width:' + (populationReport.get(0).option2/populationReport.get(0).total)*100 + '%;'}"
+										style="width: 55%"></div>
+								</div>
+								<p class="mb-0 text-white small-font">
+									बालबालिका(५-१८) <span th:if="${populationReport.get(0).option2} == 0"
+										class="float-right"
+										th:text="${((populationReport.get(0).option2/populationReport.get(0).total)*100) +'%'}">
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</span> <span th:unless="${populationReport.get(0).option2} == 0"
+										class="float-right"
+										th:text="${#numbers.formatDecimal(((populationReport.get(0).option2/populationReport.get(0).total)*100), 1, 'COMMA', 2, 'POINT') +'%'}">55%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</span>
+
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-6 col-xl-2">
+						<div class="card gradient-ohhappiness">
+							<div class="card-body">
+								<h5 class="text-white mb-0"
+									th:text="${populationReport.get(0).option3}">6200</h5>
+								<div class="progress my-3" style="height: 3px;">
+									<div class="progress-bar"
+										th:style="${'width:' + (populationReport.get(0).option3/populationReport.get(0).total)*100 + '%;'}"
+										style="width: 55%"></div>
+								</div>
+								<p class="mb-0 text-white small-font">
+									युवा(१८-४०)<span th:if="${populationReport.get(0).option3} == 0"
+										class="float-right"
+										th:text="${((populationReport.get(0).option3/populationReport.get(0).total)*100) +'%'}">
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</span> <span th:unless="${populationReport.get(0).option3} == 0"
+										class="float-right"
+										th:text="${#numbers.formatDecimal(((populationReport.get(0).option3/populationReport.get(0).total)*100), 1, 'COMMA', 2, 'POINT') +'%'}">55%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-6 col-xl-2">
+						<div class="card gradient-ibiza">
+							<div class="card-body">
+								<h5 class="text-white mb-0"
+									th:text="${populationReport.get(0).option4}">5630</h5>
+								<div class="progress my-3" style="height: 3px;">
+									<div class="progress-bar"
+										th:style="${'width:' + (populationReport.get(0).option4/populationReport.get(0).total)*100 + '%;'}"
+										style="width: 55%"></div>
+								</div>
+								<p class="mb-0 text-white small-font">
+									अधबैँसे(४०-६०) <span th:if="${populationReport.get(0).option4} == 0"
+										class="float-right"
+										th:text="${((populationReport.get(0).option4/populationReport.get(0).total)*100) +'%'}">
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</span> <span th:unless="${populationReport.get(0).option4} == 0"
+										class="float-right"
+										th:text="${#numbers.formatDecimal(((populationReport.get(0).option4/populationReport.get(0).total)*100), 1, 'COMMA', 2, 'POINT') +'%'}">55%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-6 col-xl-2">
+						<div class="card gradient-deepblue">
+							<div class="card-body">
+								<h5 class="text-white mb-0"
+									th:text="${populationReport.get(0).option5}">5630</h5>
+								<div class="progress my-3" style="height: 3px;">
+									<div class="progress-bar"
+										th:style="${'width:' + (populationReport.get(0).option5/populationReport.get(0).total)*100 + '%;'}"
+										style="width: 55%"></div>
+								</div>
+								<p class="mb-0 text-white small-font">
+									बृद्ध(६०-७०) <span th:if="${populationReport.get(0).option5} == 0"
+										class="float-right"
+										th:text="${((populationReport.get(0).option5/populationReport.get(0).total)*100) +'%'}">
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</span> <span th:unless="${populationReport.get(0).option5} == 0"
+										class="float-right"
+										th:text="${#numbers.formatDecimal(((populationReport.get(0).option5/populationReport.get(0).total)*100), 1, 'COMMA', 2, 'POINT') +'%'}">55%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-6 col-xl-2">
+						<div class="card gradient-ibiza">
+							<div class="card-body">
+								<h5 class="text-white mb-0"
+									th:text="${populationReport.get(0).option6}">5630</h5>
+								<div class="progress my-3" style="height: 3px;">
+									<div class="progress-bar"
+										th:style="${'width:' + (populationReport.get(0).option6/populationReport.get(0).total)*100 + '%;'}"
+										style="width: 55%"></div>
+								</div>
+								<p class="mb-0 text-white small-font">
+									जेष्ठ नागरिक(७० - माथि) <span
+										th:if="${populationReport.get(0).option6} == 0"
+										class="float-right"
+										th:text="${((populationReport.get(0).option6/populationReport.get(0).total)*100) +'%'}">
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</span> <span th:unless="${populationReport.get(0).option6} == 0"
+										class="float-right"
+										th:text="${#numbers.formatDecimal(((populationReport.get(0).option6/populationReport.get(0).total)*100), 1, 'COMMA', 2, 'POINT') +'%'}">55%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--Age wise population ends-->
+
+
+				<!--Sex wise population and total starts -->
+				<div class="row" th:if="${populationReport != null}">
+					<div class="col-12 col-lg-4">
+						<div class="card">
+							<div class="card-body">
+								<p>पुरुष</p>
+								<h4 class="mb-0">
+									<span th:text="${populationReport.get(1).option1}">1968
+									</span> <small th:if="${populationReport.get(1).option1} == 0"
+										class="small-font pull-right"
+										th:text="${((populationReport.get(1).option1/populationReport.get(1).total)*100) +'%'}">49.22%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</small> <small th:unless="${populationReport.get(1).option1} == 0"
+										class="small-font pull-right"
+										th:text="${#numbers.formatDecimal(((populationReport.get(1).option1/populationReport.get(1).total)*100), 1, 'COMMA', 2, 'POINT') +'%'}">49.22%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</small>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-4">
+						<div class="card">
+							<div class="card-body">
+								<p>महिला</p>
+								<h4 class="mb-0">
+									<span th:text="${populationReport.get(1).option2}">2029</span>
+									<small th:if="${populationReport.get(1).option2} == 0"
+										class="small-font pull-right"
+										th:text="${((populationReport.get(1).option2/populationReport.get(1).total)*100) +'%'}">49.22%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</small> <small th:unless="${populationReport.get(1).option2} == 0"
+										class="small-font pull-right"
+										th:text="${#numbers.formatDecimal(((populationReport.get(1).option2/populationReport.get(1).total)*100), 1, 'COMMA', 2, 'POINT') +'%'}">49.22%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</small>
+								</h4>
+							</div>
+
+						</div>
+					</div>
+					<div class="col-12 col-lg-4">
+						<div class="card">
+							<div class="card-body">
+								<p>अन्य</p>
+								<h4 class="mb-0">
+									<span th:text="${populationReport.get(1).option3}"> 1 </span> <small
+										th:if="${populationReport.get(1).option3} == 0"
+										class="small-font pull-right"
+										th:text="${((populationReport.get(1).option3/populationReport.get(1).total)*100) +'%'}">49.22%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</small> <small th:unless="${populationReport.get(1).option3} == 0"
+										class="small-font pull-right"
+										th:text="${#numbers.formatDecimal(((populationReport.get(1).option3/populationReport.get(1).total)*100), 1, 'COMMA', 2, 'POINT') +'%'}">49.22%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</small>
+								</h4>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12 col-lg-4"
+						th:if="${populationReport != null && populationReport.get(0) != null}">
+						<div class="card bg-warning">
+							<div class="card-body">
+								<p class="text-white">जम्मा जनसंख्या</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${populationReport.get(0).total}">3998</span> <small
+										class="small-font text-white">100% <i
+										class="zmdi zmdi-long-arrow-up"></i></small>
+								</h4>
+							</div>
+
+						</div>
+					</div>
+					<div class="col-12 col-lg-4"
+						th:if="${!#lists.isEmpty(extraReport) && extraReport != null}">
+						<div class="card gradient-violet">
+							<div class="card-body">
+								<p class="text-white">जम्मा घरधुरी</p>
+								<h4 class="mb-0 text-white">
+									<span th:if="${extraReport.get(1) != null}"
+										th:text="${extraReport.get(1).data}">3998</span> <small
+										class="small-font text-white">100% <i
+										class="zmdi zmdi-long-arrow-up"></i>
+									</small>
+								</h4>
+							</div>
+
+						</div>
+					</div>
+					<div class="col-12 col-lg-4"
+						th:if="${!#lists.isEmpty(extraReport) && extraReport != null}">
+						<div class="card gradient-orange">
+							<div class="card-body">
+								<p class="text-white">मृत्यु संख्या</p>
+								<h4 class="mb-0 text-white">
+									<span th:if="${extraReport.get(0) != null}"
+										th:text="${extraReport.get(0).data}">3998</span> <small
+										class="small-font text-white">100% <i
+										class="zmdi zmdi-long-arrow-up"></i>
+									</small>
+								</h4>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				<!--Sex wise population and total ends -->
+				
+				<!--Piechart and bargraph starts-->
+				<div class="row"
+					th:if="${!#lists.isEmpty(populationReport) && populationReport != null && populationReport.get(1) != null}">
+					<div class="col-12 col-lg-6 col-xl-6">
+						<canvas id="population-chart" width="100%" height="60%">
+						</canvas>
+					</div>
+					<div class="col-12 col-lg-6 col-xl-6">
+						<canvas id="gender-chart" width="100%" height="60%">
+						</canvas>
+					</div>
+				</div>
+				<!--Piechart and bargraph ends-->
+	
+				
+				<!--Added for permanent address starts-->
+				<h4	th:if="${!#lists.isEmpty(questionReport) && questionReport != null && questionReport.get(17) != null}">स्थायी ठेगाना</h4>
+				<div class="row mt-3"
+					th:if="${!#lists.isEmpty(questionReport) && questionReport != null && questionReport.get(17) != null}">
+					<div class="col-12 col-lg-6 col-xl-3">
+						<div class="card">
+							<div class="card-body">
+								<p class="mb-0 text-primary">स्थायी जन्म</p>
+								<div class="">
+									<h4 class="mb-0 py-3 text-primary">
+										<span th:text="${questionReport.get(19).option1}">203 </span>
+									</h4>
+								</div>
+								<div class="progress-wrapper">
+									<div class="progress" style="height: 5px;">
+										<div class="progress-bar bg-primary"
+											th:style="${'width:' + (questionReport.get(19).option1/questionReport.get(19).total)*100 +'%'}"
+											style="width: 18.71%"></div>
+									</div>
+								</div>
+								<p class="mb-0 mt-2 small-font">
+									<span class="float-right"> <span
+										th:if="${questionReport.get(19).option1} == 0"
+										th:text="${(questionReport.get(19).option1/questionReport.get(19).total)*100 + '%'}"></span>
+										<span th:unless="${questionReport.get(19).option1} == 0"
+										th:text="${#numbers.formatDecimal((questionReport.get(19).option1/(questionReport.get(19).total))*100, 1, 2 ) + '%'}"></span>
+										<i class="fa fa-long-arrow-up"></i>
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-6 col-xl-3">
+						<div class="card">
+							<div class="card-body">
+								<p class="mb-0 text-success">बसाईसराई</p>
+								<div class="">
+									<h4 class="mb-0 py-3 text-success">
+										<span th:text="${questionReport.get(19).option2}">203 </span>
+									</h4>
+								</div>
+								<div class="progress-wrapper">
+									<div class="progress" style="height: 5px;">
+										<div class="progress-bar bg-success"
+											th:style="${'width:' + (questionReport.get(19).option2/questionReport.get(19).total)*100 +'%'}"
+											style="width: 55.12%"></div>
+									</div>
+								</div>
+								<p class="mb-0 mt-2 small-font">
+									<span class="float-right"> <span
+										th:if="${questionReport.get(19).option2} == 0"
+										th:text="${(questionReport.get(19).option2/questionReport.get(19).total)*100 + '%'}"></span>
+										<span th:unless="${questionReport.get(19).option2} == 0"
+										th:text="${#numbers.formatDecimal((questionReport.get(19).option2/(questionReport.get(19).total))*100, 1, 2 ) + '%'}"></span>
+										<i class="fa fa-long-arrow-up"></i>
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-6 col-xl-3">
+						<div class="card">
+							<div class="card-body">
+								<p class="mb-0 text-danger">अस्थायी</p>
+								<div class="">
+									<h4 class="mb-0 py-3 text-danger">
+										<span th:text="${questionReport.get(19).option3}">203 </span>
+									</h4>
+								</div>
+								<div class="progress-wrapper">
+									<div class="progress" style="height: 5px;">
+										<div class="progress-bar bg-danger"
+											th:style="${'width:' + (questionReport.get(19).option3/questionReport.get(19).total)*100 +'%'}"
+											style="width: 7.28%"></div>
+									</div>
+								</div>
+								<p class="mb-0 mt-2 small-font">
+									<span class="float-right"> <span
+										th:if="${questionReport.get(19).option3} == 0"
+										th:text="${(questionReport.get(19).option3/questionReport.get(19).total)*100 + '%'}"></span>
+										<span th:unless="${questionReport.get(19).option3} == 0"
+										th:text="${#numbers.formatDecimal((questionReport.get(19).option3/(questionReport.get(19).total))*100, 1, 2 ) + '%'}"></span>
+										<i class="fa fa-long-arrow-up"></i>
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-6 col-xl-3">
+						<div class="card">
+							<div class="card-body">
+								<p class="mb-0 text-warning">बसाइसराइ नभएको</p>
+								<div class="">
+									<h4 class="mb-0 py-3 text-warning">
+										<span th:text="${questionReport.get(19).option4}">203 </span>
+									</h4>
+								</div>
+								<div class="progress-wrapper">
+									<div class="progress" style="height: 5px;">
+										<div class="progress-bar bg-warning"
+											th:style="${'width:' + (questionReport.get(19).option4/questionReport.get(19).total)*100 +'%'}"
+											style="width: 18.89%"></div>
+									</div>
+								</div>
+								<p class="mb-0 mt-2 small-font">
+									<span class="float-right"> <span
+										th:if="${questionReport.get(19).option4} == 0"
+										th:text="${(questionReport.get(19).option4/questionReport.get(19).total)*100 + '%'}"></span>
+										<span th:unless="${questionReport.get(19).option4} == 0"
+										th:text="${#numbers.formatDecimal((questionReport.get(19).option4/(questionReport.get(19).total))*100, 1, 2 ) + '%'}"></span>
+										<i class="fa fa-long-arrow-up"></i>
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--Added for permanent address ends-->
+
+
+				<!-- Added for caste mother tongue and religion -->
+				<div class="row" th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+					<div class="col-12 col-lg-6 col-xl-6"
+						th:if="${questionReport.get(0) != null}">
+						<div class="card">
+							<div class="card-header">मातृभाषा</div>
+							<div class="table-responsive">
+								<table class="table align-items-center">
+									<tbody>
+										<tr>
+											<td><i class="fa fa-circle text-primary mr-2"></i>
+												नेपाली</td>
+											<td th:text="${questionReport.get(0).option1}">45</td>
+											<td th:if="${questionReport.get(0).option1} == 0"
+												th:text="${(questionReport.get(0).option1/questionReport.get(0).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${questionReport.get(0).option1} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(0).option1/questionReport.get(0).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-success mr-2"></i>
+												मैथिली</td>
+											<td th:text="${questionReport.get(0).option2}">45</td>
+											<td th:if="${questionReport.get(0).option2} == 0"
+												th:text="${(questionReport.get(0).option2/questionReport.get(0).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${questionReport.get(0).option2} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(0).option2/questionReport.get(0).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-secondary mr-2"></i>
+												भोजपुरी</td>
+											<td th:text="${questionReport.get(0).option3}">45</td>
+											<td th:if="${questionReport.get(0).option3} == 0"
+												th:text="${(questionReport.get(0).option3/questionReport.get(0).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${questionReport.get(0).option3} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(0).option3/questionReport.get(0).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-warning mr-2"></i> थारु</td>
+											<td th:text="${questionReport.get(0).option4}">45</td>
+											<td th:if="${questionReport.get(0).option4} == 0"
+												th:text="${(questionReport.get(0).option4/questionReport.get(0).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${questionReport.get(0).option4} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(0).option4/questionReport.get(0).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-danger mr-2"></i> तामाङ</td>
+											<td th:text="${questionReport.get(0).option5}">45</td>
+											<td th:if="${questionReport.get(0).option5} == 0"
+												th:text="${(questionReport.get(0).option5/questionReport.get(0).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${questionReport.get(0).option5} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(0).option5/questionReport.get(0).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-info mr-2"></i> नेवार</td>
+											<td th:text="${questionReport.get(0).option6}">45</td>
+											<td th:if="${questionReport.get(0).option6} == 0"
+												th:text="${(questionReport.get(0).option6/questionReport.get(0).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${questionReport.get(0).option6} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(0).option6/questionReport.get(0).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-secondary mr-2"></i> मगर</td>
+											<td th:text="${questionReport.get(0).option7}">45</td>
+											<td th:if="${questionReport.get(0).option7} == 0"
+												th:text="${(questionReport.get(0).option7/questionReport.get(0).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${questionReport.get(0).option7} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(0).option7/questionReport.get(0).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-success mr-2"></i>
+												बज्जिका</td>
+											<td th:text="${questionReport.get(2).option8}">45</td>
+											<td th:if="${questionReport.get(2).option8} == 0"
+												th:text="${(questionReport.get(2).option8/questionReport.get(2).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${questionReport.get(2).option8} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(2).option8/questionReport.get(2).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-dark mr-2"></i> उर्दु</td>
+											<td th:text="${questionReport.get(0).option9}">45</td>
+											<td th:if="${questionReport.get(0).option9} == 0"
+												th:text="${(questionReport.get(0).option9/questionReport.get(0).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${questionReport.get(0).option9} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(0).option9/questionReport.get(0).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-warning mr-2"></i> अवाधी</td>
+											<td th:text="${questionReport.get(0).option10}">45</td>
+											<td th:if="${questionReport.get(0).option10} == 0"
+												th:text="${(questionReport.get(0).option10/questionReport.get(0).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${questionReport.get(0).option10} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(0).option10/questionReport.get(0).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-success mr-2"></i>
+												लिम्बु</td>
+											<td th:text="${questionReport.get(0).option11}">45</td>
+											<td th:if="${questionReport.get(0).option11} == 0"
+												th:text="${(questionReport.get(0).option11/questionReport.get(0).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${questionReport.get(0).option11} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(0).option11/questionReport.get(0).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-dark mr-2"></i> गुरुङ</td>
+											<td th:text="${questionReport.get(0).option12}">45</td>
+											<td th:if="${questionReport.get(0).option12} == 0"
+												th:text="${(questionReport.get(0).option12/questionReport.get(0).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${questionReport.get(0).option12} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(0).option12/questionReport.get(0).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-danger mr-2"></i> अन्य</td>
+											<td th:text="${questionReport.get(0).option13}">45</td>
+											<td th:if="${questionReport.get(0).option13} == 0"
+												th:text="${(questionReport.get(0).option13/questionReport.get(0).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${questionReport.get(0).option13} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(0).option13/questionReport.get(0).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td bgcolor="#FFFFFF" style="line-height: 50px;" colspan=3>&nbsp;</td>
+										</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-12 col-lg-6 col-xl-6"
+						th:if="${questionReport != null}">
+						<div class="card" th:if="${questionReport.get(1) != null}">
+							<div class="card-header">जाति</div>
+							<div class="table-responsive">
+								<table class="table align-items-center">
+									<tbody>
+										<tr>
+											<td><i class="fa fa-circle text-primary mr-2"></i>
+												क्षत्री</td>
+											<td th:text="${questionReport.get(1).option1}">25</td>
+											<td th:if="${questionReport.get(1).option1} == 0"
+												th:text="${(questionReport.get(1).option1/questionReport.get(1).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(1).option1} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(1).option1/(questionReport.get(1).total))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-success mr-2"></i>
+												ब्राह्मण</td>
+											<td th:text="${questionReport.get(1).option2}">25</td>
+											<td th:if="${questionReport.get(1).option2} == 0"
+												th:text="${(questionReport.get(1).option2/questionReport.get(2).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(1).option2} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(1).option2/(questionReport.get(1).total))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-secondary mr-2"></i>
+												जनजाति</td>
+											<td th:text="${questionReport.get(1).option3}">25</td>
+											<td th:if="${questionReport.get(1).option3} == 0"
+												th:text="${(questionReport.get(1).option3/questionReport.get(1).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(1).option3} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(1).option3/(questionReport.get(1).total))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-warning mr-2"></i> दलित
+											</td>
+											<td th:text="${questionReport.get(1).option4}">25</td>
+											<td th:if="${questionReport.get(1).option4} == 0"
+												th:text="${(questionReport.get(1).option4/questionReport.get(1).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(1).option4} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(1).option4/(questionReport.get(1).total))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-danger mr-2"></i> मधेशी
+											</td>
+											<td th:text="${questionReport.get(1).option5}">25</td>
+											<td th:if="${questionReport.get(1).option5} == 0"
+												th:text="${(questionReport.get(1).option5/questionReport.get(1).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(1).option5} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(1).option5/(questionReport.get(1).total))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-info mr-2"></i> मुस्लिम</td>
+											<td th:text="${questionReport.get(1).option6}">25</td>
+											<td th:if="${questionReport.get(1).option6} == 0"
+												th:text="${(questionReport.get(1).option6/questionReport.get(1).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(1).option6} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(1).option6/(questionReport.get(1).total))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-dark mr-2"></i> अन्य</td>
+											<td th:text="${questionReport.get(1).option7}">25</td>
+											<td th:if="${questionReport.get(1).option7} == 0"
+												th:text="${(questionReport.get(1).option7/questionReport.get(1).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(1).option7} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(1).option7/(questionReport.get(1).total))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+						<div class="card" th:if="${questionReport.get(2) != null}">
+							<div class="card-header">धर्म</div>
+							<div class="table-responsive">
+								<table class="table align-items-center">
+									<tbody>
+										<tr>
+											<td><i class="fa fa-circle text-primary mr-2"></i>
+												हिन्दु</td>
+											<td th:text="${questionReport.get(2).option1}">25</td>
+											<td th:if="${questionReport.get(2).option1} == 0"
+												th:text="${(questionReport.get(2).option1/questionReport.get(2).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(2).option1} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(2).option1/(questionReport.get(2).total))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-success mr-2"></i> बौद्ध
+											</td>
+											<td th:text="${questionReport.get(2).option2}">25</td>
+											<td th:if="${questionReport.get(2).option2} == 0"
+												th:text="${(questionReport.get(2).option2/questionReport.get(2).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(2).option2} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(2).option2/(questionReport.get(2).total))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-secondary mr-2"></i>
+												इस्लाम</td>
+											<td th:text="${questionReport.get(2).option3}">25</td>
+											<td th:if="${questionReport.get(2).option3} == 0"
+												th:text="${(questionReport.get(2).option3/questionReport.get(2).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(2).option3} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(2).option3/(questionReport.get(2).total))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-warning mr-2"></i>
+												किँरात</td>
+											<td th:text="${questionReport.get(2).option4}">25</td>
+											<td th:if="${questionReport.get(2).option4} == 0"
+												th:text="${(questionReport.get(2).option4/questionReport.get(2).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(2).option4} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(2).option4/(questionReport.get(2).total))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-secondary mr-2"></i>
+												ईसाई</td>
+											<td th:text="${questionReport.get(2).option5}">25</td>
+											<td th:if="${questionReport.get(2).option5} == 0"
+												th:text="${(questionReport.get(2).option5/questionReport.get(2).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(2).option5} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(2).option5/(questionReport.get(2).total))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-warning mr-2"></i>
+												निर्दिष्ट / अन्य</td>
+											<td th:text="${questionReport.get(2).option6}">25</td>
+											<td th:if="${questionReport.get(2).option6} == 0"
+												th:text="${(questionReport.get(2).option6/questionReport.get(2).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(2).option6} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(2).option6/(questionReport.get(2).total))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- added for caste mother tongue and religion ends -->
+
+				<!-- added for education and foreign employment starts -->
+				<div class="row" th:if="${!#lists.isEmpty(populationReport) && populationReport != null}">
+					<div class="col-12 col-lg-6 col-xl-6"
+						th:if="${populationReport.get(2) != null}">
+						<div class="card">
+							<div class="card-header">शिक्षाको अवस्था</div>
+							<div class="table-responsive">
+								<table class="table align-items-center">
+									<tbody>
+										<tr>
+											<td><i class="fa fa-circle text-primary mr-2"></i>
+												पिएचडि</td>
+											<td th:text="${populationReport.get(2).option1}">45</td>
+											<td th:if="${populationReport.get(2).option1} == 0"
+												th:text="${(populationReport.get(2).option1/populationReport.get(2).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${populationReport.get(2).option1} == 0"
+												th:text="${#numbers.formatDecimal((populationReport.get(2).option1/populationReport.get(2).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-success mr-2"></i> एमफिल
+											</td>
+											<td th:text="${populationReport.get(2).option2}">45</td>
+											<td th:if="${populationReport.get(2).option2} == 0"
+												th:text="${(populationReport.get(2).option2/populationReport.get(2).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${populationReport.get(2).option2} == 0"
+												th:text="${#numbers.formatDecimal((populationReport.get(2).option2/populationReport.get(2).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-secondary mr-2"></i>
+												मास्टर डिग्री(स्नातकोत्तर)</td>
+											<td th:text="${populationReport.get(2).option3}">45</td>
+											<td th:if="${populationReport.get(2).option3} == 0"
+												th:text="${(populationReport.get(2).option3/populationReport.get(2).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${populationReport.get(2).option3} == 0"
+												th:text="${#numbers.formatDecimal((populationReport.get(2).option3/populationReport.get(2).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-warning mr-2"></i>
+												स्नाताक</td>
+											<td th:text="${populationReport.get(2).option4}">45</td>
+											<td th:if="${populationReport.get(2).option4} == 0"
+												th:text="${(populationReport.get(2).option4/populationReport.get(2).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${populationReport.get(2).option4} == 0"
+												th:text="${#numbers.formatDecimal((populationReport.get(2).option4/populationReport.get(2).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-danger mr-2"></i> उच्च
+												विद्यालय</td>
+											<td th:text="${populationReport.get(2).option5}">45</td>
+											<td th:if="${populationReport.get(2).option5} == 0"
+												th:text="${(populationReport.get(2).option5/populationReport.get(2).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${populationReport.get(2).option5} == 0"
+												th:text="${#numbers.formatDecimal((populationReport.get(2).option5/populationReport.get(2).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-primary mr-2"></i>
+												माध्यमिक</td>
+											<td th:text="${populationReport.get(2).option6}">45</td>
+											<td th:if="${populationReport.get(2).option6} == 0"
+												th:text="${(populationReport.get(2).option6/populationReport.get(2).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${populationReport.get(2).option6} == 0"
+												th:text="${#numbers.formatDecimal((populationReport.get(2).option6/populationReport.get(2).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-secondary mr-2"></i>
+												तल्लो माध्यमिक</td>
+											<td th:text="${populationReport.get(2).option7}">45</td>
+											<td th:if="${populationReport.get(2).option7} == 0"
+												th:text="${(populationReport.get(2).option7/populationReport.get(2).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${populationReport.get(2).option7} == 0"
+												th:text="${#numbers.formatDecimal((populationReport.get(2).option7/populationReport.get(2).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-success mr-2"></i>
+												प्राथमिक</td>
+											<td th:text="${populationReport.get(2).option8}">45</td>
+											<td th:if="${populationReport.get(2).option8} == 0"
+												th:text="${(populationReport.get(2).option8/populationReport.get(2).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${populationReport.get(2).option8} == 0"
+												th:text="${#numbers.formatDecimal((populationReport.get(2).option8/populationReport.get(2).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-dark mr-2"></i> सामान्य
+												शिक्षा</td>
+											<td th:text="${populationReport.get(2).option9}">45</td>
+											<td th:if="${populationReport.get(2).option9} == 0"
+												th:text="${(populationReport.get(2).option9/populationReport.get(2).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${populationReport.get(2).option9} == 0"
+												th:text="${#numbers.formatDecimal((populationReport.get(2).option9/populationReport.get(2).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-warning mr-2"></i>
+												असाक्षर</td>
+											<td th:text="${populationReport.get(2).option10}">45</td>
+											<td th:if="${populationReport.get(2).option10} == 0"
+												th:text="${(populationReport.get(2).option10/populationReport.get(2).total)*100 + '%'}">1.13%</td>
+											<td th:unless="${populationReport.get(2).option10} == 0"
+												th:text="${#numbers.formatDecimal((populationReport.get(2).option10/populationReport.get(2).total)*100, 1, 2) + '%'}">1.13%</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-12 col-lg-6 col-xl-6"
+						th:if="${questionReport != null}">
+						<div class="card" th:if="${questionReport.get(5) != null}">
+							<div class="card-header">बैदेशिक अध्ययन</div>
+							<div class="table-responsive">
+								<table class="table align-items-center">
+									<tbody>
+										<tr>
+											<td><i class="fa fa-circle text-primary mr-2"></i>
+												अष्ट्रेलिया</td>
+											<td th:text="${questionReport.get(5).option1}">25</td>
+											<td th:if="${questionReport.get(5).option1} == 0"
+												th:text="${(questionReport.get(5).option1/questionReport.get(5).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(5).option1} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(5).option1/(questionReport.get(5).total - questionReport.get(5).option5))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-success mr-2"></i> यू.के
+											</td>
+											<td th:text="${questionReport.get(5).option2}">25</td>
+											<td th:if="${questionReport.get(5).option2} == 0"
+												th:text="${(questionReport.get(5).option2/questionReport.get(5).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(5).option2} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(5).option2/(questionReport.get(5).total - questionReport.get(5).option5))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-secondary mr-2"></i>
+												यू.एस.ए</td>
+											<td th:text="${questionReport.get(5).option3}">25</td>
+											<td th:if="${questionReport.get(5).option3} == 0"
+												th:text="${(questionReport.get(5).option3/questionReport.get(5).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(5).option3} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(5).option3/(questionReport.get(5).total - questionReport.get(5).option5))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-warning mr-2"></i> अन्य
+											</td>
+											<td th:text="${questionReport.get(5).option4}">25</td>
+											<td th:if="${questionReport.get(5).option4} == 0"
+												th:text="${(questionReport.get(5).option4/questionReport.get(5).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(5).option4} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(5).option4/(questionReport.get(5).total - questionReport.get(5).option5))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+						<div class="card" th:if="${questionReport.get(4) != null}">
+							<div class="card-header">बैदेशिक रोजगारी</div>
+							<div class="table-responsive">
+								<table class="table align-items-center">
+									<tbody>
+										<tr>
+											<td><i class="fa fa-circle text-primary mr-2"></i> गल्फ
+											</td>
+											<td th:text="${questionReport.get(4).option1}">25</td>
+											<td th:if="${questionReport.get(4).option1} == 0"
+												th:text="${(questionReport.get(4).option1/questionReport.get(4).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(4).option1} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(4).option1/(questionReport.get(4).total - questionReport.get(4).option5))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-success mr-2"></i> यूरोप
+											</td>
+											<td th:text="${questionReport.get(4).option2}">25</td>
+											<td th:if="${questionReport.get(4).option2} == 0"
+												th:text="${(questionReport.get(4).option2/questionReport.get(4).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(4).option2} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(4).option2/(questionReport.get(4).total - questionReport.get(4).option5))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-secondary mr-2"></i>
+												एसिया</td>
+											<td th:text="${questionReport.get(4).option3}">25</td>
+											<td th:if="${questionReport.get(4).option3} == 0"
+												th:text="${(questionReport.get(4).option3/questionReport.get(4).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(4).option3} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(4).option3/(questionReport.get(4).total - questionReport.get(4).option5))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+										<tr>
+											<td><i class="fa fa-circle text-warning mr-2"></i> अन्य
+											</td>
+											<td th:text="${questionReport.get(4).option4}">25</td>
+											<td th:if="${questionReport.get(4).option4} == 0"
+												th:text="${(questionReport.get(4).option4/questionReport.get(4).total)*100 + '%'}">20.49%</td>
+											<td th:unless="${questionReport.get(4).option4} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(4).option4/(questionReport.get(4).total - questionReport.get(4).option5))*100, 1, 2 ) + '%'}">20.49%</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- added for education and foreign employment ends-->
+
+				<!-- fuel and waste management starts -->
+				<div class="row"
+					th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+					<div class="col-12 col-lg-6 col-xl-6"
+						th:if="${questionReport.get(7) != null}">
+						<h4>खाना पकाउन प्रयोग गरिने इन्धन</h4>
+						<div class="row">
+							<div class="col-12 col-lg-6">
+								<div class="card bg-danger">
+									<div class="card-body">
+										<p class="text-white">LP ग्याँस</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(7).option1}">848</span> <small
+												class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(7).option1} == 0"
+												th:text="${(questionReport.get(7).option1/questionReport.get(7).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(7).option1} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(7).option1/questionReport.get(7).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-danger">
+									<div class="card-body">
+										<p class="text-white">मट्टीतेल</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(7).option2}">848</span> <small
+												class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(7).option2} == 0"
+												th:text="${(questionReport.get(7).option2/questionReport.get(7).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(7).option2} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(7).option2/questionReport.get(7).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-danger">
+									<div class="card-body">
+										<p class="text-white">दाउरा</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(7).option3}">848</span> <small
+												class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(7).option3} == 0"
+												th:text="${(questionReport.get(7).option3/questionReport.get(7).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(7).option3} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(7).option3/questionReport.get(7).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-danger">
+									<div class="card-body">
+										<p class="text-white">अन्य</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(7).option4}">848</span> <small
+												class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(7).option4} == 0"
+												th:text="${(questionReport.get(7).option4/questionReport.get(7).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(7).option4} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(7).option4/questionReport.get(7).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-12 col-lg-6 col-xl-6"
+						th:if="${questionReport.get(6) != null}">
+						<h4>फोहरमैला व्यवस्थापन</h4>
+						<div class="row">
+							<div class="col-12 col-lg-6">
+								<div class="card bg-success">
+									<div class="card-body">
+										<p class="text-white">मल बनाउनु</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(6).option1}">848</span> <small
+												class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(6).option1} == 0"
+												th:text="${(questionReport.get(6).option1/questionReport.get(6).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(6).option1} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(6).option1/questionReport.get(6).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-success">
+									<div class="card-body">
+										<p class="text-white">निजि संकलन</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(6).option2}">848</span> <small
+												class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(6).option2} == 0"
+												th:text="${(questionReport.get(6).option2/questionReport.get(6).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(6).option2} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(6).option2/questionReport.get(6).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-success">
+									<div class="card-body">
+										<p class="text-white">महानगरको गाडीमा पठाउने</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(6).option3}">848</span> <small
+												class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(6).option3} == 0"
+												th:text="${(questionReport.get(6).option3/questionReport.get(6).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(6).option3} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(6).option3/questionReport.get(6).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-success">
+									<div class="card-body">
+										<p class="text-white">अन्य</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(6).option4}">848</span> <small
+												class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(6).option4} == 0"
+												th:text="${(questionReport.get(6).option4/questionReport.get(6).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(6).option4} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(6).option4/questionReport.get(6).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<!-- fuel and waste management ends -->
+
+				<!-- Vehicle information starts -->
+				<h4	th:if="${!#lists.isEmpty(questionReport) && questionReport != null && questionReport.get(3) != null}">सवारी
+					साधन</h4>
+				<div class="row mt-3"
+					th:if="${!#lists.isEmpty(questionReport) && questionReport != null && questionReport.get(3) != null}">
+					<div class="col-12 col-lg-6 col-xl-3">
+						<div class="card">
+							<div class="card-body">
+								<p class="mb-0 text-primary">मोटर</p>
+								<div class="">
+									<h4 class="mb-0 py-3 text-primary">
+										<span th:text="${questionReport.get(3).option1}">203 </span><span
+											class="float-right"><i class="zmdi zmdi-car"></i></span>
+									</h4>
+								</div>
+								<div class="progress-wrapper">
+									<div class="progress" style="height: 5px;">
+										<div class="progress-bar bg-primary"
+											th:style="${'width:' + (questionReport.get(3).option1/questionReport.get(3).total)*100 +'%'}"
+											style="width: 18.71%"></div>
+									</div>
+								</div>
+								<p class="mb-0 mt-2 small-font">
+									<span class="float-right"> <span
+										th:if="${questionReport.get(3).option1} == 0"
+										th:text="${(questionReport.get(3).option1/questionReport.get(3).total)*100 + '%'}"></span>
+										<span th:unless="${questionReport.get(3).option1} == 0"
+										th:text="${#numbers.formatDecimal((questionReport.get(3).option1/(questionReport.get(3).total - questionReport.get(3).option5))*100, 1, 2 ) + '%'}"></span>
+										<i class="fa fa-long-arrow-up"></i>
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-6 col-xl-3">
+						<div class="card">
+							<div class="card-body">
+								<p class="mb-0 text-success">मो.साईकल</p>
+								<div class="">
+									<h4 class="mb-0 py-3 text-success">
+										<span th:text="${questionReport.get(3).option2}">203 </span><span
+											class="float-right"><i class="fa fa-motorcycle"></i></span>
+									</h4>
+								</div>
+								<div class="progress-wrapper">
+									<div class="progress" style="height: 5px;">
+										<div class="progress-bar bg-success"
+											th:style="${'width:' + (questionReport.get(3).option2/questionReport.get(3).total)*100 +'%'}"
+											style="width: 55.12%"></div>
+									</div>
+								</div>
+								<p class="mb-0 mt-2 small-font">
+									<span class="float-right"> <span
+										th:if="${questionReport.get(3).option2} == 0"
+										th:text="${(questionReport.get(3).option2/questionReport.get(3).total)*100 + '%'}"></span>
+										<span th:unless="${questionReport.get(3).option2} == 0"
+										th:text="${#numbers.formatDecimal((questionReport.get(3).option2/(questionReport.get(3).total - questionReport.get(3).option5))*100, 1, 2 ) + '%'}"></span>
+										<i class="fa fa-long-arrow-up"></i>
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-6 col-xl-3">
+						<div class="card">
+							<div class="card-body">
+								<p class="mb-0 text-danger">साईकल</p>
+								<div class="">
+									<h4 class="mb-0 py-3 text-danger">
+										<span th:text="${questionReport.get(3).option3}">203 </span> <span
+											class="float-right"><i class="zmdi zmdi-bike"></i></span>
+									</h4>
+								</div>
+								<div class="progress-wrapper">
+									<div class="progress" style="height: 5px;">
+										<div class="progress-bar bg-danger"
+											th:style="${'width:' + (questionReport.get(3).option3/questionReport.get(3).total)*100 +'%'}"
+											style="width: 7.28%"></div>
+									</div>
+								</div>
+								<p class="mb-0 mt-2 small-font">
+									<span class="float-right"> <span
+										th:if="${questionReport.get(3).option3} == 0"
+										th:text="${(questionReport.get(3).option3/questionReport.get(3).total)*100 + '%'}"></span>
+										<span th:unless="${questionReport.get(3).option3} == 0"
+										th:text="${#numbers.formatDecimal((questionReport.get(3).option3/(questionReport.get(3).total - questionReport.get(3).option5))*100, 1, 2 ) + '%'}"></span>
+										<i class="fa fa-long-arrow-up"></i>
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-6 col-xl-3">
+						<div class="card">
+							<div class="card-body">
+								<p class="mb-0 text-warning">अन्य</p>
+								<div class="">
+									<h4 class="mb-0 py-3 text-warning">
+										<span th:text="${questionReport.get(3).option4}">203 </span> <span
+											class="float-right"><i class="zmdi zmdi-airplane"></i></span>
+									</h4>
+								</div>
+								<div class="progress-wrapper">
+									<div class="progress" style="height: 5px;">
+										<div class="progress-bar bg-warning"
+											th:style="${'width:' + (questionReport.get(3).option4/questionReport.get(3).total)*100 +'%'}"
+											style="width: 18.89%"></div>
+									</div>
+								</div>
+								<p class="mb-0 mt-2 small-font">
+									<span class="float-right"> <span
+										th:if="${questionReport.get(3).option4} == 0"
+										th:text="${(questionReport.get(3).option4/questionReport.get(3).total)*100 + '%'}"></span>
+										<span th:unless="${questionReport.get(3).option4} == 0"
+										th:text="${#numbers.formatDecimal((questionReport.get(3).option4/(questionReport.get(3).total - questionReport.get(3).option5))*100, 1, 2 ) + '%'}"></span>
+										<i class="fa fa-long-arrow-up"></i>
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Vehicle information ends -->
+				
+				<!-- income section starts -->
+				<div class="row income-panel"
+					th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+					<div class="col-12 col-lg-6 col-xl-6"
+						th:if="${questionReport.get(8) != null}">
+						<h4>वार्षिक आम्दानी</h4>
+						<div class="row mt-3">
+							<div class="col-12 col-lg-6 col-xl-6">
+								<div class="card bg-primary">
+									<div class="card-body">
+										<p class="mb-0 text-white">१,००,०००/- भन्दा कम</p>
+										<div class="">
+											<h4 class="mb-0 py-3 text-white">
+												<span th:text="${questionReport.get(8).option1}"> </span> <span
+													class="float-right"><i class="fa fa-money"></i></span>
+											</h4>
+										</div>
+										<div class="progress-wrapper">
+											<div class="progress" style="height: 5px;">
+												<div class="progress-bar"
+													th:style="${'width:' + (questionReport.get(8).option1/questionReport.get(8).total)*100 +'%;'}"
+													style="width: 0%"></div>
+											</div>
+										</div>
+										<p class="mb-0 mt-2 small-font text-white">
+											<span class="float-right"> <span
+												th:if="${questionReport.get(8).option1} == 0"
+												th:text="${(questionReport.get(8).option1/questionReport.get(8).total)*100 + '%'}"></span>
+												<span th:unless="${questionReport.get(8).option1} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(8).option1/questionReport.get(8).total)*100, 1, 2) + '%'}"></span>
+												<i class="fa fa-long-arrow-up"></i>
+											</span>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6 col-xl-6">
+								<div class="card bg-primary">
+									<div class="card-body">
+										<p class="mb-0 text-white">१,००,००१/- देखि २,५०,०००/-</p>
+										<div class="">
+											<h4 class="mb-0 py-3 text-white">
+												<span th:text="${questionReport.get(8).option2}"> </span> <span
+													class="float-right"><i class="fa fa-money"></i></span>
+											</h4>
+										</div>
+										<div class="progress-wrapper">
+											<div class="progress" style="height: 5px;">
+												<div class="progress-bar"
+													th:style="${'width:' + (questionReport.get(8).option2/questionReport.get(8).total)*100 +'%;'}"
+													style="width: 0%"></div>
+											</div>
+										</div>
+										<p class="mb-0 mt-2 small-font text-white">
+											<span class="float-right"> <span
+												th:if="${questionReport.get(8).option2} == 0"
+												th:text="${(questionReport.get(8).option2/questionReport.get(8).total)*100 + '%'}"></span>
+												<span th:unless="${questionReport.get(8).option2} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(8).option2/questionReport.get(8).total)*100, 1, 2) + '%'}"></span>
+												<i class="fa fa-long-arrow-up"></i>
+											</span>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6 col-xl-6">
+								<div class="card bg-primary">
+									<div class="card-body">
+										<p class="mb-0 text-white">२,५०,००१/- देखि ४,००,०००</p>
+										<div class="">
+											<h4 class="mb-0 py-3 text-white">
+												<span th:text="${questionReport.get(8).option3}"> </span> <span
+													class="float-right"><i class="fa fa-money"></i></span>
+											</h4>
+										</div>
+										<div class="progress-wrapper">
+											<div class="progress" style="height: 5px;">
+												<div class="progress-bar"
+													th:style="${'width:' + (questionReport.get(8).option3/questionReport.get(8).total)*100 +'%;'}"
+													style="width: 0%"></div>
+											</div>
+										</div>
+										<p class="mb-0 mt-2 small-font text-white">
+											<span class="float-right"> <span
+												th:if="${questionReport.get(8).option3} == 0"
+												th:text="${(questionReport.get(8).option3/questionReport.get(8).total)*100 + '%'}"></span>
+												<span th:unless="${questionReport.get(8).option3} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(8).option3/questionReport.get(8).total)*100, 1, 2) + '%'}"></span>
+												<i class="fa fa-long-arrow-up"></i>
+											</span>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6 col-xl-6">
+								<div class="card bg-primary">
+									<div class="card-body">
+										<p class="mb-0 text-white">४,००,००१/- देखि ६,००,०००</p>
+										<div class="">
+											<h4 class="mb-0 py-3 text-white">
+												<span th:text="${questionReport.get(8).option4}"> </span> <span
+													class="float-right"><i class="fa fa-money"></i></span>
+											</h4>
+										</div>
+										<div class="progress-wrapper">
+											<div class="progress" style="height: 5px;">
+												<div class="progress-bar"
+													th:style="${'width:' + (questionReport.get(8).option4/questionReport.get(8).total)*100 +'%;'}"
+													style="width: 0%"></div>
+											</div>
+										</div>
+										<p class="mb-0 mt-2 small-font text-white">
+											<span class="float-right"> <span
+												th:if="${questionReport.get(8).option4} == 0"
+												th:text="${(questionReport.get(8).option4/questionReport.get(8).total)*100 + '%'}"></span>
+												<span th:unless="${questionReport.get(8).option4} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(8).option4/questionReport.get(8).total)*100, 1, 2) + '%'}"></span>
+												<i class="fa fa-long-arrow-up"></i>
+											</span>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6 col-xl-6">
+								<div class="card bg-primary">
+									<div class="card-body">
+										<p class="mb-0 text-white">६,००,०००१/- देखि ८,००,०००</p>
+										<div class="">
+											<h4 class="mb-0 py-3 text-white">
+												<span th:text="${questionReport.get(8).option5}"> </span> <span
+													class="float-right"><i class="fa fa-money"></i></span>
+											</h4>
+										</div>
+										<div class="progress-wrapper">
+											<div class="progress" style="height: 5px;">
+												<div class="progress-bar"
+													th:style="${'width:' + (questionReport.get(8).option5/questionReport.get(8).total)*100 +'%;'}"
+													style="width: 0%"></div>
+											</div>
+										</div>
+										<p class="mb-0 mt-2 small-font text-white">
+											<span class="float-right"> <span
+												th:if="${questionReport.get(8).option5} == 0"
+												th:text="${(questionReport.get(8).option5/questionReport.get(8).total)*100 + '%'}"></span>
+												<span th:unless="${questionReport.get(8).option5} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(8).option5/questionReport.get(8).total)*100, 1, 2) + '%'}"></span>
+												<i class="fa fa-long-arrow-up"></i>
+											</span>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6 col-xl-6">
+								<div class="card bg-primary">
+									<div class="card-body">
+										<p class="mb-0 text-white">८,००,०००१/- भन्दा माथि</p>
+										<div class="">
+											<h4 class="mb-0 py-3 text-white">
+												<span th:text="${questionReport.get(8).option6}"> </span> <span
+													class="float-right"><i class="fa fa-money"></i></span>
+											</h4>
+										</div>
+										<div class="progress-wrapper">
+											<div class="progress" style="height: 5px;">
+												<div class="progress-bar"
+													th:style="${'width:' + (questionReport.get(8).option6/questionReport.get(8).total)*100 +'%;'}"
+													style="width: 0%"></div>
+											</div>
+										</div>
+										<p class="mb-0 mt-2 small-font text-white">
+											<span class="float-right"> <span
+												th:if="${questionReport.get(8).option6} == 0"
+												th:text="${(questionReport.get(8).option6/questionReport.get(8).total)*100 + '%'}"></span>
+												<span th:unless="${questionReport.get(8).option6} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(8).option6/questionReport.get(8).total)*100, 1, 2) + '%'}"></span>
+												<i class="fa fa-long-arrow-up"></i>
+											</span>
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-12 col-lg-6 col-xl-6"
+						th:if="${!#lists.isEmpty(questionReport.get(8)) && questionReport.get(9) != null}">
+						<h4>वार्षिक खर्च</h4>
+						<div class="row mt-3">
+							<div class="col-12 col-lg-6 col-xl-6">
+								<div class="card bg-warning">
+									<div class="card-body">
+										<p class="mb-0 text-white">१,००,०००/- भन्दा कम</p>
+										<div class="">
+											<h4 class="mb-0 py-3 text-white">
+												<span th:text="${questionReport.get(9).option1}"> </span> <span
+													class="float-right"><i class="fa fa-money"></i></span>
+											</h4>
+										</div>
+										<div class="progress-wrapper">
+											<div class="progress" style="height: 5px;">
+												<div class="progress-bar"
+													th:style="${'width:' + (questionReport.get(9).option1/questionReport.get(8).total)*100 +'%;'}"
+													style="width: 0%"></div>
+											</div>
+										</div>
+										<p class="mb-0 mt-2 small-font text-white">
+											<span class="float-right"> <span
+												th:if="${questionReport.get(9).option1} == 0"
+												th:text="${(questionReport.get(9).option1/questionReport.get(8).total)*100 + '%'}"></span>
+												<span th:unless="${questionReport.get(9).option1} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(9).option1/questionReport.get(8).total)*100, 1, 2) + '%'}"></span>
+												<i class="fa fa-long-arrow-up"></i>
+											</span>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6 col-xl-6">
+								<div class="card bg-warning">
+									<div class="card-body">
+										<p class="mb-0 text-white">१,००,००१/- देखि २,५०,०००/-</p>
+										<div class="">
+											<h4 class="mb-0 py-3 text-white">
+												<span th:text="${questionReport.get(9).option2}"> </span> <span
+													class="float-right"><i class="fa fa-money"></i></span>
+											</h4>
+										</div>
+										<div class="progress-wrapper">
+											<div class="progress" style="height: 5px;">
+												<div class="progress-bar"
+													th:style="${'width:' + (questionReport.get(9).option2/questionReport.get(8).total)*100 +'%;'}"
+													style="width: 0%"></div>
+											</div>
+										</div>
+										<p class="mb-0 mt-2 small-font text-white">
+											<span class="float-right"> <span
+												th:if="${questionReport.get(9).option2} == 0"
+												th:text="${(questionReport.get(9).option2/questionReport.get(8).total)*100 + '%'}"></span>
+												<span th:unless="${questionReport.get(9).option2} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(9).option2/questionReport.get(8).total)*100, 1, 2) + '%'}"></span>
+												<i class="fa fa-long-arrow-up"></i>
+											</span>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6 col-xl-6">
+								<div class="card bg-warning">
+									<div class="card-body">
+										<p class="mb-0 text-white">२,५०,००१/- देखि ४,००,०००</p>
+										<div class="">
+											<h4 class="mb-0 py-3 text-white">
+												<span th:text="${questionReport.get(9).option3}"> </span> <span
+													class="float-right"><i class="fa fa-money"></i></span>
+											</h4>
+										</div>
+										<div class="progress-wrapper">
+											<div class="progress" style="height: 5px;">
+												<div class="progress-bar"
+													th:style="${'width:' + (questionReport.get(9).option3/questionReport.get(8).total)*100 +'%;'}"
+													style="width: 0%"></div>
+											</div>
+										</div>
+										<p class="mb-0 mt-2 small-font text-white">
+											<span class="float-right"> <span
+												th:if="${questionReport.get(9).option3} == 0"
+												th:text="${(questionReport.get(9).option3/questionReport.get(8).total)*100 + '%'}"></span>
+												<span th:unless="${questionReport.get(9).option3} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(9).option3/questionReport.get(8).total)*100, 1, 2) + '%'}"></span>
+												<i class="fa fa-long-arrow-up"></i>
+											</span>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6 col-xl-6">
+								<div class="card bg-warning">
+									<div class="card-body">
+										<p class="mb-0 text-white">४,००,००१/- देखि ६,००,०००</p>
+										<div class="">
+											<h4 class="mb-0 py-3 text-white">
+												<span th:text="${questionReport.get(9).option4}"> </span> <span
+													class="float-right"><i class="fa fa-money"></i></span>
+											</h4>
+										</div>
+										<div class="progress-wrapper">
+											<div class="progress" style="height: 5px;">
+												<div class="progress-bar"
+													th:style="${'width:' + (questionReport.get(9).option4/questionReport.get(8).total)*100 +'%;'}"
+													style="width: 0%"></div>
+											</div>
+										</div>
+										<p class="mb-0 mt-2 small-font text-white">
+											<span class="float-right"> <span
+												th:if="${questionReport.get(9).option4} == 0"
+												th:text="${(questionReport.get(9).option4/questionReport.get(8).total)*100 + '%'}"></span>
+												<span th:unless="${questionReport.get(9).option4} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(9).option4/questionReport.get(8).total)*100, 1, 2) + '%'}"></span>
+												<i class="fa fa-long-arrow-up"></i>
+											</span>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6 col-xl-6">
+								<div class="card bg-warning">
+									<div class="card-body">
+										<p class="mb-0 text-white">६,००,०००१/- देखि ८,००,०००</p>
+										<div class="">
+											<h4 class="mb-0 py-3 text-white">
+												<span th:text="${questionReport.get(9).option5}"> </span> <span
+													class="float-right"><i class="fa fa-money"></i></span>
+											</h4>
+										</div>
+										<div class="progress-wrapper">
+											<div class="progress" style="height: 5px;">
+												<div class="progress-bar"
+													th:style="${'width:' + (questionReport.get(9).option5/questionReport.get(8).total)*100 +'%;'}"
+													style="width: 0%"></div>
+											</div>
+										</div>
+										<p class="mb-0 mt-2 small-font text-white">
+											<span class="float-right"> <span
+												th:if="${questionReport.get(9).option5} == 0"
+												th:text="${(questionReport.get(9).option5/questionReport.get(8).total)*100 + '%'}"></span>
+												<span th:unless="${questionReport.get(9).option5} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(9).option5/questionReport.get(8).total)*100, 1, 2) + '%'}"></span>
+												<i class="fa fa-long-arrow-up"></i>
+											</span>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6 col-xl-6">
+								<div class="card bg-warning">
+									<div class="card-body">
+										<p class="mb-0 text-white">८,००,०००१/- भन्दा माथि</p>
+										<div class="">
+											<h4 class="mb-0 py-3 text-white">
+												<span th:text="${questionReport.get(9).option6}"> </span> <span
+													class="float-right"><i class="fa fa-money"></i></span>
+											</h4>
+										</div>
+										<div class="progress-wrapper">
+											<div class="progress" style="height: 5px;">
+												<div class="progress-bar"
+													th:style="${'width:' + (questionReport.get(9).option6/questionReport.get(8).total)*100 +'%;'}"
+													style="width: 0%"></div>
+											</div>
+										</div>
+										<p class="mb-0 mt-2 small-font text-white">
+											<span class="float-right"> <span
+												th:if="${questionReport.get(9).option6} == 0"
+												th:text="${(questionReport.get(9).option6/questionReport.get(8).total)*100 + '%'}"></span>
+												<span th:unless="${questionReport.get(9).option6} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(9).option6/questionReport.get(8).total)*100, 1, 2) + '%'}"></span>
+												<i class="fa fa-long-arrow-up"></i>
+											</span>
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- income section starts -->
+
+				<!--Added for Krishi Dashboard-->
+				<h4 th:if="${!#lists.isEmpty(extraReport) && extraReport != null}">कृषि तथा पशुपालन</h4>
+				<div th:if="${!#lists.isEmpty(extraReport) && extraReport != null}"
+					class="row"
+					th:with="totalHousehold=${#numbers.formatInteger(extraReport.get(1).data,1)}">
+					<div class="col-12 col-lg-3"
+						th:if="${!#lists.isEmpty(extraReport) && extraReport != null}"
+						th:attr="onclick=|getAgriculturalFarmReport()|">
+						<div class="card bg-warning">
+							<div class="card-body"
+								th:with="agriculturalFarm=${#numbers.formatInteger(extraReport.get(5).data,1)}">
+								<p class="text-white">कृषि फर्म</p>
+								<h4 class="mb-0 text-white"
+									th:with="agriculturalFarmPercent=${agriculturalFarm}/${totalHousehold} * 100">
+									<span th:text="${extraReport.get(5).data}">3998</span> <small
+										class="small-font text-white float-right"
+										th:text="${#numbers.formatDecimal(agriculturalFarmPercent, 1, 2) + '%'}">100%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</small>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-3"
+						th:if="${!#lists.isEmpty(extraReport) && extraReport != null}"
+						th:attr="onclick=|getBeekeepingReport()|">
+						<div class="card gradient-violet">
+							<div class="card-body"
+								th:with="beekeeping=${#numbers.formatInteger(extraReport.get(4).data,1)}">
+								<p class="text-white">मौरीपालन</p>
+								<h4 class="mb-0 text-white"
+									th:with="beekeepingPercent=${beekeeping}/${totalHousehold} * 100">
+									<span th:if="${extraReport.get(4) != null}"
+										th:text="${extraReport.get(4).data}">3998</span> <small
+										class="small-font text-white float-right"
+										th:text="${#numbers.formatDecimal(beekeepingPercent, 1, 2) + '%'}">100%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</small>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-3"
+						th:if="${!#lists.isEmpty(extraReport) && extraReport != null}"
+						th:attr="onclick=|getAgriculturalCropReport()|">
+						<div class="card gradient-orange">
+							<div class="card-body"
+								th:with="crops=${#numbers.formatInteger(extraReport.get(3).data,1)}">
+								<p class="text-white">कृषिबाली</p>
+								<h4 class="mb-0 text-white"
+									th:with="cropsPercent=${crops}/${totalHousehold} * 100">
+									<span th:if="${extraReport.get(3).data != null}"
+										th:text="${extraReport.get(3).data}">3998</span> <small
+										class="small-font text-white float-right"
+										th:text="${#numbers.formatDecimal(cropsPercent, 1, 2) + '%'}">100%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</small>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-3"
+						th:if="${!#lists.isEmpty(extraReport) && extraReport != null}"
+						th:attr="onclick=|getAnimalsReport()|">
+						<div class="card bg-success">
+							<div class="card-body"
+								th:with="animals=${#numbers.formatInteger(extraReport.get(2).data,1)}">
+								<p class="text-white">पशुपन्छि पाल्ने</p>
+								<h4 class="mb-0 text-white"
+									th:with="animalsPercent=${animals}/${totalHousehold} * 100">
+									<span th:text="${extraReport.get(2).data}">3998</span> <small
+										class="small-font text-white float-right"
+										th:text="${#numbers.formatDecimal(animalsPercent, 1, 2) + '%'}">100%
+										<i class="zmdi zmdi-long-arrow-up"></i>
+									</small>
+								</h4>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--Added for Krishi Dashboard ends-->
+
+
+
+				<!--Added for Remarkable Places Dashboard-->
+				<h4 th:if="${!#lists.isEmpty(favPlaceReport) && favPlaceReport != null}">महत्वपुर्ण स्थलहरुः</h4>
+				<!-- First Row -->
+				<div th:if="${!#lists.isEmpty(favPlaceReport) && favPlaceReport != null}" class="row">
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(favPlaceReport) && favPlaceReport != null}">
+						<div class="card bg-success">
+							<div class="card-body">
+								<p class="text-white">मन्दिर</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${favPlaceReport.get(0).data}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(favPlaceReport) && favPlaceReport != null}">
+						<div class="card bg-success">
+							<div class="card-body">
+								<p class="text-white">पार्क</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${favPlaceReport.get(1).data}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(favPlaceReport) && favPlaceReport != null}">
+						<div class="card bg-success">
+							<div class="card-body">
+								<p class="text-white">पोखरी</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${favPlaceReport.get(2).data}">3998</span>
+								</h4>
+							</div>
+
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(favPlaceReport) && favPlaceReport != null}">
+						<div class="card bg-success">
+							<div class="card-body">
+								<p class="text-white">इनार/पँधेरी</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${favPlaceReport.get(3).data}">3998</span>
+								</h4>
+							</div>
+
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(favPlaceReport) && favPlaceReport != null}">
+						<div class="card bg-success">
+							<div class="card-body">
+								<p class="text-white">स्तुपा/मूर्ति</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${favPlaceReport.get(4).data}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(favPlaceReport) && favPlaceReport != null}">
+						<div class="card bg-success">
+							<div class="card-body">
+								<p class="text-white">विद्यालय</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${favPlaceReport.get(5).data}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!--Second Row -->
+				<div th:if="${!#lists.isEmpty(favPlaceReport) && favPlaceReport != null}" class="row">
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(favPlaceReport) && favPlaceReport != null}">
+						<div class="card bg-success">
+							<div class="card-body">
+								<p class="text-white">संघ/संस्था</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${favPlaceReport.get(6).data}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(favPlaceReport) && favPlaceReport != null}">
+						<div class="card bg-success">
+							<div class="card-body">
+								<p class="text-white">गुँठी</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${favPlaceReport.get(7).data}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(favPlaceReport) && favPlaceReport != null}">
+						<div class="card bg-success">
+							<div class="card-body">
+								<p class="text-white">अन्य</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${favPlaceReport.get(8).data}">3998</span>
+								</h4>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				<!--Added for Remarkable places Dashboard ends-->
+
+
+				<!--Added for child section start -->
+<!-- 				<h4>बालबालिका खण्ड</h4> -->
+				<div class="row" th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+					<div class="col-12 col-lg-6 col-xl-6"
+						th:if="${questionReport.get(11) != null}">
+						<h4>१८ वर्षभन्दा कम उमेरका भिन्न शारिरीक तथा मानसिक क्षमता भएका बालक</h4>
+						<div class="row">
+							<div class="col-12 col-lg-6">
+								<div class="card bg-danger">
+									<div class="card-body">
+										<p class="text-white">शारीरिक अपाङ्गता</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(11).option1}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(11).option1} == 0"
+												th:text="${(questionReport.get(11).option1/questionReport.get(11).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(11).option1} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(11).option1/questionReport.get(11).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-danger">
+									<div class="card-body">
+										<p class="text-white">दृष्टिविहिन र न्युन दृष्टिविहिन</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(11).option2}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(11).option2} == 0"
+												th:text="${(questionReport.get(11).option2/questionReport.get(11).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(11).option2} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(11).option2/questionReport.get(11).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-danger">
+									<div class="card-body">
+										<p class="text-white">बोल्न नसक्ने</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(11).option3}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(11).option3} == 0"
+												th:text="${(questionReport.get(11).option3/questionReport.get(11).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(11).option3} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(11).option3/questionReport.get(11).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-danger">
+									<div class="card-body">
+										<p class="text-white">सुस्त श्रवण</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(11).option4}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(11).option4} == 0"
+												th:text="${(questionReport.get(11).option4/questionReport.get(11).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(11).option4} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(11).option4/questionReport.get(11).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-danger">
+									<div class="card-body">
+										<p class="text-white">मानसिक अपाङ्गता</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(11).option5}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(11).option5} == 0"
+												th:text="${(questionReport.get(11).option5/questionReport.get(11).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(11).option5} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(11).option5/questionReport.get(11).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-danger">
+									<div class="card-body">
+										<p class="text-white">श्रवण र दृष्टिविहिन (दुवै)</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(11).option6}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(11).option6} == 0"
+												th:text="${(questionReport.get(11).option6/questionReport.get(11).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(11).option6} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(11).option6/questionReport.get(11).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-danger">
+									<div class="card-body">
+										<p class="text-white">अन्य</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(11).option7}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(11).option7} == 0"
+												th:text="${(questionReport.get(11).option7/questionReport.get(11).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(11).option7} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(11).option7/questionReport.get(11).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-danger">
+									<div class="card-body">
+										<p class="text-white">छैन</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(11).option8}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(11).option8} == 0"
+												th:text="${(questionReport.get(11).option8/questionReport.get(11).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(11).option8} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(11).option8/questionReport.get(11).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-12 col-lg-6 col-xl-6"
+						th:if="${questionReport.get(6) != null}">
+						<h4>१८ वर्षभन्दा कम उमेरका भिन्न शारिरीक तथा मानसिक क्षमता
+							भएका बालिका</h4>
+						<div class="row">
+							<div class="col-12 col-lg-6">
+								<div class="card bg-success">
+									<div class="card-body">
+										<p class="text-white">शारीरिक अपाङ्गता</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(12).option1}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(12).option1} == 0"
+												th:text="${(questionReport.get(12).option1/questionReport.get(12).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(12).option1} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(12).option1/questionReport.get(12).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-success">
+									<div class="card-body">
+										<p class="text-white">दृष्टिविहिन र न्युन दृष्टिविहिन</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(12).option2}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(12).option2} == 0"
+												th:text="${(questionReport.get(12).option2/questionReport.get(12).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(12).option2} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(12).option2/questionReport.get(12).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-success">
+									<div class="card-body">
+										<p class="text-white">बोल्न नसक्ने</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(12).option3}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(12).option3} == 0"
+												th:text="${(questionReport.get(12).option3/questionReport.get(12).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(12).option3} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(12).option3/questionReport.get(12).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-success">
+									<div class="card-body">
+										<p class="text-white">सुस्त श्रवण</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(12).option4}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(12).option4} == 0"
+												th:text="${(questionReport.get(12).option4/questionReport.get(12).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(12).option4} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(12).option4/questionReport.get(12).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-success">
+									<div class="card-body">
+										<p class="text-white">मानसिक अपाङ्गता</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(12).option5}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(12).option5} == 0"
+												th:text="${(questionReport.get(12).option5/questionReport.get(12).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(12).option5} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(12).option5/questionReport.get(12).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-success">
+									<div class="card-body">
+										<p class="text-white">श्रवण र दृष्टिविहिन (दुवै)</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(12).option6}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(12).option6} == 0"
+												th:text="${(questionReport.get(12).option6/questionReport.get(12).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(12).option6} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(12).option6/questionReport.get(12).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-success">
+									<div class="card-body">
+										<p class="text-white">अन्य</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(12).option7}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(12).option7} == 0"
+												th:text="${(questionReport.get(12).option7/questionReport.get(12).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(12).option7} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(12).option7/questionReport.get(12).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="card bg-success">
+									<div class="card-body">
+										<p class="text-white">छैन</p>
+										<h4 class="mb-0 text-white">
+											<span th:text="${questionReport.get(12).option8}">848</span>
+											<small class="small-font text-white pull-right"> <span
+												th:if="${questionReport.get(12).option8} == 0"
+												th:text="${(questionReport.get(12).option8/questionReport.get(12).total) * 100 + '%'}">94.12%</span>
+
+												<span th:unless="${questionReport.get(12).option8} == 0"
+												th:text="${#numbers.formatDecimal((questionReport.get(12).option8/questionReport.get(12).total) * 100, 1, 2) + '%'}">94.12%</span>
+												<i class="zmdi zmdi-long-arrow-up"></i>
+											</small>
+										</h4>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<!--Health services started -->
+				<h4	th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">उपचार
+					प्राथमिकता</h4>
+				<div
+					th:if="${!#lists.isEmpty(questionReport) && questionReport != null}"
+					class="row">
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">लामा, धामी, झाँऋी</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(13).option1}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">परंपरागत वैद्य</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(13).option2}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">स्वास्थ्य चौकी</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(13).option3}">3998</span>
+								</h4>
+							</div>
+
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">अस्पताल (निजी, सरकारी)</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(13).option4}">3998</span>
+								</h4>
+							</div>
+
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">अन्य</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(13).option5}">3998</span>
+								</h4>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				<!--Health services ends -->
+
+				<!--School leaving children starts-->
+				
+				<div class="row" th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+				<div class="col-12 col-lg-2 col-xl-6"
+						th:if="${questionReport.get(14) != null}">
+				<h4	th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">बिचैमा
+					विद्यालय जान छोडेका बालबालिकाहरु</h4>
+				<div th:if="${!#lists.isEmpty(questionReport) && questionReport != null}"
+					class="row">
+					<div class="col-12 col-lg-3"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">बालक</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(14).option1}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-3"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">बालिका</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(14).option2}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-3"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">छैन</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(14).option3}">3998</span>
+								</h4>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				</div>
+				<!--School leaving children ends-->
+			
+				<!--Child care center section starts -->
+				<div class="col-12 col-lg-2 col-xl-6"
+						th:if="${questionReport.get(15) != null}">
+				<h4	th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">बाल	बिकास केन्द्र वा पुर्व प्रा. वि तहमा जाने बालबालिकाहरु</h4>
+				<div
+					th:if="${!#lists.isEmpty(questionReport) && questionReport != null}"
+					class="row">
+					<div class="col-12 col-lg-3"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">बालक</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(15).option1}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-3"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">बालिका</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(15).option2}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-3"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">छैन</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(15).option3}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			</div>	
+				
+				<!--Child care center section ends -->
+
+				<!--Children mistake section starts -->
+				<h4	th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">बालबालिकाहरुले
+					गल्ती गरेमा</h4>
+				<div
+					th:if="${!#lists.isEmpty(questionReport) && questionReport != null}"
+					class="row">
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">गाली</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(16).option1}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">कुटपीट</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(16).option2}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">खानामा बन्देज</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(16).option3}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">कोठामा थुन्ने</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(16).option4}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">सम्झाउने</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(16).option5}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">अन्य</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(16).option6}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--Children mistake section ends -->
+
+				<!--Women and children violence section starts -->
+				<h4 th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">महिला वा बालबालिका उपर हिंसा</h4>
+				<div th:if="${!#lists.isEmpty(questionReport) && questionReport != null}"
+					class="row">
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">दाईजोसम्बन्धी</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(17).option1}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">वहुविवाह</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(17).option2}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">घरायसी हिंसा</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(17).option3}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">बालविवाह</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(17).option4}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">बलात्कार</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(17).option5}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">महिला/बालबालिका बेचबिखन</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(17).option6}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">कुनै पनि घटना नघटेको</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(17).option6}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--Women and children violence section ends -->
+
+				<!--Child mortality section starts -->
+				<h4 th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">बितेको १ वर्षभित्र ५ वर्षमुनिका बालबालिकाको मृत्यु</h4>
+				<div th:if="${!#lists.isEmpty(questionReport) && questionReport != null}"
+					class="row">
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">छ</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(18).option1}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-2"
+						th:if="${!#lists.isEmpty(questionReport) && questionReport != null}">
+						<div class="card bg-primary">
+							<div class="card-body">
+								<p class="text-white">छैन</p>
+								<h4 class="mb-0 text-white">
+									<span th:text="${questionReport.get(18).option2}">3998</span>
+								</h4>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--Child mortality section ends -->
+				<!-- Added for child section ends -->
+
+<!-- 				Section for GIS map display starts -->
+<!-- 				Whole Map -->
+<!-- 				<iframe th:if="${selectedWard} == 0" -->
+<!-- 					src="https://www.google.com/maps/d/u/4/embed?mid=1UiLicUMkP68ViB13JxDaHtEtRd3ZzNUl"  -->
+<!-- 					width="100%" height="600"></iframe> -->
+
+<!-- 				Ward No 1 -->
+<!-- 				<iframe th:if="${selectedWard} == 1" -->
+<!-- 					src="https://www.google.com/maps/d/u/4/embed?mid=1Az9TClsf0vYf0GfjA-HMuXAz4CR8cOUt"  -->
+<!-- 					width="100%" height="600"></iframe> -->
+
+<!-- 				Ward No 2  -->
+<!-- 				<iframe th:if="${selectedWard} == 2" -->
+<!-- 					src="https://www.google.com/maps/d/u/4/embed?mid=1xIieSgd0IZyCv0uNi-KWZD7SHe1rAonC" -->
+<!-- 					width="100%" height="600"></iframe> -->
+
+<!-- 				Ward No 3 -->
+<!-- 				<iframe th:if="${selectedWard} == 3" -->
+<!-- 					src="https://www.google.com/maps/d/u/4/embed?mid=1CFdYZdWHFnxxmb4osqUQ7ePOYMCjcX-3"  -->
+<!-- 					width="100%" height="600"></iframe> -->
+
+<!-- 				Ward No 4 -->
+<!-- 				<iframe th:if="${selectedWard} == 4" -->
+<!-- 					src="https://www.google.com/maps/d/u/4/embed?mid=1gPZjOzj8FZ7ZB1fD_TerODoQ-dR26R3I"  -->
+<!-- 					width="100%" height="600"></iframe> -->
+
+<!-- 				Ward No 5 -->
+<!-- 				<iframe th:if="${selectedWard} == 5" -->
+<!-- 					src="https://www.google.com/maps/d/u/4/embed?mid=1a-7Rb7gCvSYD9uAGxllrJF3cMbZ7Vycg"  -->
+<!-- 					width="100%" height="600"></iframe> -->
+
+<!-- 				Ward No 6 -->
+<!-- 				<iframe th:if="${selectedWard} == 6" -->
+<!-- 					src="https://www.google.com/maps/d/u/4/embed?mid=1Dhz7_steNmT0wSUOzFeBD9sKRU0MDZd2"  -->
+<!-- 					width="100%" height="600"></iframe> -->
+
+<!-- 				Ward No 7 -->
+<!-- 				<iframe th:if="${selectedWard} == 7" -->
+<!-- 					src="https://www.google.com/maps/d/u/4/embed?mid=1B3odIdQqA8a5HgY_K-oMwsa-YzFiWI8x"  -->
+<!-- 					width="100%" height="600"></iframe> -->
+
+<!-- 				Ward No 8 -->
+<!-- 				<iframe th:if="${selectedWard} == 8" -->
+<!-- 					src="https://www.google.com/maps/d/u/4/embed?mid=1tLhOMdE8AG25hO9jhk8jaY109fnMDWmT"  -->
+<!-- 					width="100%" height="600"></iframe> -->
+
+<!-- 				Ward No 9 -->
+<!-- 				<iframe th:if="${selectedWard} == 9" -->
+<!-- 					src="https://www.google.com/maps/d/u/4/embed?mid=1GcBZdrBSq-7e5DJuBqGM_DlA4B0r6nD5"  -->
+<!-- 					width="100%" height="600"></iframe> -->
+
+<!-- 				Ward No 10 -->
+<!-- 				<iframe th:if="${selectedWard} == 10" -->
+<!-- 					src="https://www.google.com/maps/d/u/4/embed?mid=1hFB4BzZYHAhj_OSVXgb-E48HD42m9ZN1"  -->
+<!-- 					width="100%" height="600"></iframe> -->
+
+<!-- 				Ward No 11 -->
+<!-- 				<iframe th:if="${selectedWard} == 11" -->
+<!-- 					src="https://www.google.com/maps/d/u/4/embed?mid=1MtOOfRnXHo8v5B9Q43UrA-_ogxngQhay"  -->
+<!-- 					width="100%" height="600"></iframe> -->
+
+<!-- 				Ward No 12 -->
+<!-- 				<iframe th:if="${selectedWard} == 12" -->
+<!-- 					src="https://www.google.com/maps/d/u/4/embed?mid=1aDfay-xRIOHbw79HEACgSMOg_eG1OIzD"  -->
+<!-- 					width="100%" height="600"></iframe> -->
+			
+<!-- 				Section for GIS map display ends -->
+				
+					
+				<!--End Dashboard Content-->
+			</div>
+			<!-- End container-fluid-->
+		</div>
+		<!--End content-wrapper-->
+
+
+		<a href="javaScript:void();" class="back-to-top"><i
+			class="fa fa-angle-double-up"></i> </a>
+		<!--End Back To Top Button-->
+
+		<!--Start footer-->
+		<footer th:replace="~{fragments/footer :: footer}"></footer>
+	</div>
+	<!--End wrapper-->
+	<div th:replace="~{fragments/scripts :: scripts}"></div>
+	<!-- loader scripts -->
+	<script th:src="@{/assets/plugins/Chart.js/Chart.min.js}"
+		src="assets/plugins/Chart.js/Chart.min.js"></script>
+	<!-- Index js -->
+
+
+	<script th:inline="javascript">
+	/*<![CDATA[*/
+		var wardNumber = /*[[${selectedWard}]]*/ '0';
+		/*]]>*/
+	
+	
+
+		$(function() {
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$(document).ajaxSend(function(e, xhr, options) {
+				xhr.setRequestHeader(header, token);
+			});
+		});
+		
+		
+		$(window).on("load", function(e) {
+			onLoad();
+		})
+
+		function onLoad() {
+			$("#ward-wise-select").val(wardNumber);
+		}
+		
+		
+		
+		function generateReport() {
+		let thisWard = $("#ward-wise-select").val();
+			$.ajax({
+				method : "POST",
+				url : contextPath + "/report/" + thisWard,
+				contentType : "Application/Json",
+				success : function(result) {
+					swal.fire(
+						{
+							text : "The latest report has been generated",
+							icon : "success",
+							closeOnClickOutside : false,
+							closeOnEsc : false
+						}).then(function() {
+							window.location.href = contextPath + "/report?selectedWard=" + thisWard;
+						});
+				},
+				error : function(error) {
+				}
+			});
+		}
+		
+		function getBeekeepingReport() {
+		let thisWard = $("#ward-wise-select").val();
+			$.ajax({
+				method : "GET",
+				url : contextPath + "/report/beekeeping/" + thisWard,
+				contentType : "Application/Json",
+				success : function(result) {
+					swal.fire(
+						{
+							text : "The beekeeping report has been generated",
+							icon : "success",
+							closeOnClickOutside : false,
+							closeOnEsc : false
+						})
+						.then(function() {
+							window.location.href = contextPath + "/report/beekeeping/" + thisWard;
+						});
+				},
+				error : function(error) {
+				}
+			});
+		}
+		
+		
+		function getAgriculturalFarmReport() {
+		let thisWard = $("#ward-wise-select").val();
+			$.ajax({
+				method : "GET",
+				url : contextPath + "/report/agriculturalFarm/" + thisWard,
+				contentType : "Application/Json",
+				success : function(result) {
+					swal.fire(
+						{
+							text : "The Agricultural Farm report has been generated",
+							icon : "success",
+							closeOnClickOutside : false,
+							closeOnEsc : false
+						})
+						.then(function() {
+							window.location.href = contextPath + "/report/agriculturalFarm/" + thisWard;
+						});
+				},
+				error : function(error) {
+				}
+			});
+		}
+		
+		
+		function getAgriculturalCropReport() {
+		let thisWard = $("#ward-wise-select").val();
+			$.ajax({
+				method : "GET",
+				url : contextPath + "/report/agriculturalCrop/" + thisWard,
+				contentType : "Application/Json",
+				success : function(result) {
+					swal.fire(
+						{
+							text : "The Agricultural Crop report has been generated",
+							icon : "success",
+							closeOnClickOutside : false,
+							closeOnEsc : false
+						})
+						.then(function() {
+							window.location.href = contextPath + "/report/agriculturalCrop/" + thisWard;
+						});
+				},
+				error : function(error) {
+				}
+			});
+		}
+		
+		
+		function getAnimalsReport() {
+		let thisWard = $("#ward-wise-select").val();
+			$.ajax({
+				method : "GET",
+				url : contextPath + "/report/animals/" + thisWard,
+				contentType : "Application/Json",
+				success : function(result) {
+					swal.fire(
+						{
+							text : "The Animals report has been generated",
+							icon : "success",
+							closeOnClickOutside : false,
+							closeOnEsc : false
+						})
+						.then(function() {
+							window.location.href = contextPath + "/report/animals/" + thisWard;
+						});
+				},
+				error : function(error) {
+				}
+			});
+		}
+	
+		$(function() {
+				let totalInfants = /*[[${totalInfants}]]*/ 0;
+				let totalChildrens = /*[[${totalChildrens}]]*/ 0;
+				let totalYouths = /*[[${totalYouths}]]*/ 0;
+				let totalMidage = /*[[${totalMidage}]]*/ 0;
+				let totalOldage = /*[[${totalOldage}]]*/ 0;
+				let totalSeniorCitizens = /*[[${totalSeniorCitizens}]]*/ 0;
+				
+				let totalMale = /*[[${totalMale}]]*/ 0;
+				let totalFemale = /*[[${totalFemale}]]*/ 0;
+				let totalOthers = /*[[${totalOthers}]]*/ 0;
+				new Chart(document.getElementById("population-chart"), {
+				    type: 'bar',
+				    data: {
+				      labels: ["जम्मा शिसु", "जम्मा बालबालिका", "जम्मा युवा", "जम्मा अधबैँसे", "जम्मा बृद्ध", "जम्मा जेष्ठ नागरिक"],
+				      datasets: [
+				        {
+				          label: "नगरपालिकाको जनसंख्या",
+				          backgroundColor: ["#4547e6", "#f98026", "#50be69", "#f53343", "#dc143c", "#ffd700"],
+				          data: [totalInfants, totalChildrens, totalYouths, totalMidage, totalOldage, totalSeniorCitizens],
+				        }
+				      ]
+				    },
+				    options: {
+				      title: {
+				        display: true,
+				        text: 'उमेर समूह अनुसारको तथ्यांक'
+				      },
+				      scales: {
+				          yAxes: [{
+				              ticks: {
+				                  beginAtZero:true,
+				              }
+				          }]
+				      }
+				    }
+				});
+				
+				new Chart(document.getElementById("gender-chart"), {
+				    type: 'pie',
+				    data: {
+				      labels: ["पुरुष", "महिला", "अन्य"],
+				      datasets: [{
+				        label: "Population (millions)",
+				        backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f"],
+				        data: [totalMale, totalFemale, totalOthers]
+				      }]
+				    },
+				    options: {
+				      title: {
+				        display: true,
+				        text: 'लिङ्ग अनुसारको तथ्यांक'
+				      }
+				    }
+				});
+		});
+		
+		
+		
+		
+		$("#ward-wise-select").on("change", function(event) {
+			let wardNumber = $(this).val();
+			let finalUrl = contextPath + "/report?selectedWard=" + wardNumber
+			$.ajax({
+				url : finalUrl,
+				method: "GET",
+				contentType: "application/json"
+			}).done(function(data) {
+            	swal.fire({
+            		icon : "success",
+            		text : "Report for selected ward is loaded"
+            	}).then((btnClick) => {
+            		if(btnClick.value) {
+            			window.location.href = contextPath + "/report?selectedWard=" + wardNumber;	
+            		}
+            	});
+            }).fail(function(data) {
+            	swal.fire({
+            		icon : "error",
+            		text : "Sorry, there was error on loading report"
+            	}).then((btnClick) => {
+            		if(btnClick.value) {
+            			location.reload(true);		
+            		}
+            	});
+			});
+		});
+		
+	</script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+<title>दक्षिणकाली नगरपालिका</title>
+<!--favicon-->
+<link rel="icon" th:href="@{/assets/images/favicon1.ico}"
+	href="assets/images/favicon1.ico" type="image/x-icon" />
+<link th:href="@{/assets/plugins/vectormap/jquery-jvectormap-2.0.2.css}"
+	href="assets/plugins/vectormap/jquery-jvectormap-2.0.2.css"
+	rel="stylesheet" />
+<link th:href="@{/assets/plugins/simplebar/css/simplebar.css}"
+	href="/assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+<link th:href="@{/assets/css/bootstrap.min.css}"
+	href="/assets/css/bootstrap.min.css" rel="stylesheet" />
+<link th:href="@{/assets/css/animate.css}"
+	href="/assets/css/animate.css" rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/icons.css}" href="assets/css/icons.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/sidebar-menu.css}"
+	href="assets/css/sidebar-menu.css" rel="stylesheet" />
+<link th:href="@{/assets/css/app-style.css}"
+	href="assets/css/app-style.css" rel="stylesheet" />
+
+</head>
+<body>
+	<div id="wrapper">
+		<!--           	Sidebar and header -->
+		<div th:replace="~{fragments/private-sidebar :: private-sidebar}"></div>
+		<header th:replace="~{fragments/header :: header}" class="header1">
+		</header>
+		<div class="clearfix"></div>
+		<div class="content-wrapper">
+			<div class="container-fluid" id="pjax-container">
+				<div class="row pt-2 pb-2">
+					<div class="col-sm-9">
+						<h4 class="page-title">नगरबासी बिवरण कम्प्युटर प्रणाली</h4>
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="javaScript:void();">गृह</a></li>
+							<li class="breadcrumb-item active" aria-current="page">प्रयोगकर्ता
+								बिवरण परिवर्तन</li>
+						</ol>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-body">
+						<div class="card-title">प्रयोगकर्ता बिवरण</div>
+						<form id="profile-update-form">
+							<input type="hidden" name="userId" id="userId"
+								th:value="${userInfo.userId}">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="input-1">पुरा नाम</label> <input id="name" type="text"
+										class="form-control " name="name"
+										th:value="${userInfo.fullName}" required
+										autocomplete="name" autofocus placeholder="Enter Your Name">
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="username">युसर नाम</label> <input id="username"
+										type="text" class="form-control " name="username"
+										th:value="${userInfo.username}" required
+										placeholder="Enter your username">
+								</div>
+							</div>
+							
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="email">इमेल</label> <input id="email" type="email"
+										class="form-control " name="email"
+										th:value="${userInfo.email}" required
+										placeholder="Enter Your Email Address">
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="mobile">मोबाईल नम्बर</label> <input id="mobile"
+										type="text" class="form-control " name="mobile"
+										th:value="${userInfo.mobileNumber}"
+										placeholder="Enter Your Mobile Number" required title="Mobile number should be of 10 digits" pattern="[1-9]{1}[0-9]{9}">
+								</div>
+							</div>
+							
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="account-type">खाताको प्रकार</label> <select
+										id="account-type">
+										<option th:value="${role.id}" th:each="role: ${roles}"
+											th:text="${role.roleNepali}">केन्द्रिय एडमिन</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="ward-no">वडा नम्बर</label> <select id="ward-no">
+										<option th:value="${wardNo}" th:each="wardNo: ${wards}"
+											th:text="${wardNo}" )>1</option>
+									</select>
+								</div>
+								
+							</div>
+							<div class="form-group">
+								<button type="submit" class="btn btn-primary px-5">
+									<i class="icon-lock"></i> परिवर्तन गर्नुहोस
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a href="javaScript:void();" class="back-to-top"><i
+			class="fa fa-angle-double-up"></i> </a>
+		<footer th:replace="~{fragments/footer :: footer}"></footer>
+	</div>
+	<div th:replace="~{fragments/scripts :: scripts}"></div>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var userObj = /*[[${userInfo}]]*/'';
+		var roleObj = /*[[${roles}]]*/'';
+		/*]]>*/
+	
+	
+		var roleHolder = userObj.roles[0];
+			$(function () {
+	    	    var token = $("meta[name='_csrf']").attr("content");
+	    	    var header = $("meta[name='_csrf_header']").attr("content");
+	    	    $(document).ajaxSend(function(e, xhr, options) {
+	    	        xhr.setRequestHeader(header, token);
+	    	    });
+	    	});
+		
+			$(window).on("load", function(e) {
+				evaluateAnswers();
+			})
+			
+			
+			function evaluateAnswers() {
+				$("#ward-no").val(eval(userObj.wardNo));
+				let roleVal;
+				if(roleHolder == "SUPER_ADMIN") {
+					roleVal = 1
+				} else if(roleHolder == "CENTRAL_ADMIN") {
+					roleVal = 2
+				} else if(roleHolder == "WARD_ADMIN") {
+					roleVal = 3
+				} else if(roleHolder == "SURVEYOR") {
+					roleVal = 4
+				}
+
+				$("#account-type").val(eval(roleVal));
+			}
+			
+			
+			$(function() {
+				 $("#profile-update-form").on("submit", function(event) {
+					event.preventDefault();
+					let userId = $("#userId").val();
+					let fullName = $("#name").val();
+					let userName = $("#username").val();
+					let email = $("#email").val();
+					let mobileNumber = $("#mobile").val();
+					let wardNo = $("#ward-no").val();
+					let role = $("#account-type").val();
+					let userInfo = {
+						"mobileNumber": mobileNumber,
+						"fullName": fullName,
+						"userName": userName,
+						"email": email,
+						"wardNo": wardNo,
+						"role": role
+					};
+					
+					swal.fire({
+						title : 'Are you sure you want to change your info?',
+						text : "You won't be able to revert this!",
+						icon : 'warning',
+						showCancelButton : true,
+						confirmButtonColor : '#3085d6',
+						cancelButtonColor : '#d33',
+						confirmButtonText : 'Yes, change it!'
+					}).then((btnClicked) => {
+						if(btnClicked.value) {
+							$.ajax({
+								url : contextPath + "/super-admin/" + userId,
+								method : "PATCH",
+								contentType: "application/json",
+								data: JSON.stringify(userInfo),
+							}).done(function(data) {
+								swal.fire({
+									icon : "success",
+									text : data.data
+								}).then((btnClick) => {
+									if(btnClick.value) {
+										location.reload(true);		
+									}
+								});
+							}).fail(function(data) {
+								swal.fire({
+									icon : "fail",
+									text : data.data
+								}).then((btnClick) => {
+									if(btnClick.value) {
+										location.reload(true);		
+									}
+								});
+							});
+						}
+					});
+				});
+			});
+		</script>
+</body>
+</html>

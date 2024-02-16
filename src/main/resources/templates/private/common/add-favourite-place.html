@@ -1,0 +1,570 @@
+ 
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+<title>दक्षिणकाली नगरपालिका</title>
+<link rel="icon" th:href="@{/assets/images/favicon1.ico}"
+	href="assets/images/favicon1.ico" type="image/x-icon" />
+<link th:href="@{/assets/plugins/vectormap/jquery-jvectormap-2.0.2.css}"
+	href="assets/plugins/vectormap/jquery-jvectormap-2.0.2.css"
+	rel="stylesheet" />
+<link th:href="@{/assets/plugins/simplebar/css/simplebar.css}"
+	href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+<link th:href="@{/assets/css/bootstrap.min.css}"
+	href="assets/css/bootstrap.min.css" rel="stylesheet" />
+<link th:href="@{/assets/css/animate.css}" href="assets/css/animate.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/icons.css}" href="assets/css/icons.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/sidebar-menu.css}"
+	href="assets/css/sidebar-menu.css" rel="stylesheet" />
+
+<link th:href="@{/assets/css/app-style.css}"
+	href="assets/css/app-style.css" rel="stylesheet" />
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/datatable/datatables.min.css}"
+	href="assets/plugins/datatable/datatables.min.css">
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/jquery.steps/css/jquery.steps.css}"
+	href="assets/plugins/jquery.steps/css/jquery.steps.css">
+<link rel="stylesheet" th:href="@{/assets/css/leaflet.css}"/>
+
+
+<style>
+.form-group {
+	width: 100%;
+}
+
+.wizard>.content {
+	background: #fff;
+	min-height: 430px;
+	margin: 0;
+}
+
+.wizard>.content>.body {
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.member-panel .padding, .member-panel-submit .padding {
+	padding: 10px;
+}
+
+.wizard>.content>.body label.error {
+	margin-left: 0;
+}
+
+#mapid {
+	height: 50em;
+	width: 50em;
+}
+
+.error_form {
+	top: 12px;
+	color: rgb(216, 15, 15);
+	font-size: 15px;
+	font-family: Helvetica;
+}
+</style>
+</head>
+<body>
+	<div id="wrapper">
+		<!-- Side bar and header -->
+		<div th:replace="~{fragments/private-sidebar :: private-sidebar}"></div>
+		<header th:replace="~{fragments/header :: header}" class="header1"> </header>
+		<div class="clearfix"></div>
+		<div class="content-wrapper">
+			<div class="container-fluid" id="pjax-container">
+				<div class="row pt-2 pb-2">
+					<div class="col-sm-9">
+						<h4 class="page-title">Data Management System</h4>
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="javaScript:void();">Home</a></li>
+							<li class="breadcrumb-item active" aria-current="page">Add
+								Favourite Place</li>
+						</ol>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-body">
+						<div class="card-title">Fill up information about the place.</div>
+						
+						<input type="hidden" name="_token"
+							value="8c82ziy1cyPf0NeyqhEeRv0dAIMt2CyuvpgsRMOu"> <input
+							type="hidden" name="_method" value="post">
+<!-- 						<form name="favPlaceForm" id="favPlaceForm" method="POST" -->
+<!-- 							th:action="@{/favourite-place/image}"	enctype="multipart/form-data" class="unicode"> -->
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="placeName">Place Name</label> <input type="text"
+										id="placeName" name="placeName" class="form-control required" />
+										<span class="error_form" id="placeName_error_message"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="placeWard">Ward number</label> 
+										<select id="placeWard" name="placeWard" class="form-control required">
+												<option
+													th:each="ward, iteration : ${wardList}"
+													th:value="${iteration.index + 1}" th:text="${ward}"></option>
+										</select>
+									<span class="error_form" id="placeWard_error_message"></span>										
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="placeType">Place Type</label> <select
+										id="placeType" name="placeType" class="form-control required">
+										<option th:each="place, iteration : ${placeTypes}"
+											th:value="${iteration.index + 1}" th:text="${place}">
+										</option>
+									</select>
+									<span class="error_form" id="placeType_error_message"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="placeDescription">Place Description</label>
+									<textarea name="placeDescription" id="placeDescription"  rows="20"
+										class="form-control required" placeholder="Write description">
+									</textarea>
+									<span class="error_form" id="placeDescription_error_message"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="placeImage">Photo Of The Place</label> 
+									<form th:id="favPlaceImg" th:name="favPlaceImg" enctype="multipart/form-data" useToken="true"><input
+										type="file" class="form-control" id="placeImage" name="placeImage" value="" data-event="change"
+										data-target="placeImage" accept="image/*" /> <a href=""
+										style="display: none" target="_blank" class="no-pjax"> <img
+										src="" style="display: none" class="img-thumbnail placeImage"></a></form>
+									<span class="error_form" id="placeImage_error_message"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="placeGPS">Location</label> <input type="text"
+										id="placeGPS" name="placeGPS" placeholder="Click to add location"
+										class="form-control required" readonly>
+									<span class="error_form" id="placeGPS_error_message"></span>
+								</div>
+							</div>
+							<div class="form-group">
+								<button id="add-favourite-btn" class="btn btn-primary px-5">
+									<i class="icon-lock"></i>  Add Place
+								</button>
+							</div>
+<!-- 						</form> -->
+					</div>
+				</div>
+
+				<!-- Modal For GPS  -->
+				<div class="modal fade" id="map-location-modal" data-keyboard="false" data-backdrop="false" role="dialog" aria-hidden="true">
+					<div class="modal-dialog modal-lg modal-dialog-centered"
+						role="document">
+						<div class="modal-content" style="border-radius: 10px;">
+							<div class="modal-header">
+								<h5 class="modal-title">
+									<b><span>Please Select the Location On Map</span></b>
+								</h5>
+
+								<button id="cancel-location-btn"
+									class="btn btn-danger pull-right">
+									<b>✘</b>
+								</button>
+							</div>
+							<div class="modal-content-body">
+								<div class="row" style="margin: 5px;">
+									<div style="margin: 20px auto;">
+										<div id="mapid"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a href="javaScript:void();" class="back-to-top"><i
+			class="fa fa-angle-double-up"></i> </a>
+		<footer th:replace="~{fragments/footer :: footer}"></footer> 
+	</div>
+	<div th:replace="~{fragments/scripts :: scripts}">
+	</div>
+	<!-- 	<!--Start footer-->
+	<script th:src="@{/assets/js/leaflet.js}"></script>
+	<script th:inline="javascript">
+		$(function () {
+		    var token = $("meta[name='_csrf']").attr("content");
+		    var header = $("meta[name='_csrf_header']").attr("content");
+		    $(document).ajaxSend(function(e, xhr, options) {
+		        xhr.setRequestHeader(header, token);
+		    });
+		});	
+	
+		//For displaying the selected image for uploading
+		$(function() {
+			var _t, _n, _d, _v;
+			$("input[data-event='change']").on("change", function() {
+				_t = this;
+				_c = $(this).data("target");
+				if (_t.files && _t.files[0]) {
+					var reader = new FileReader();
+					reader.onload = function(e) {
+						$('img.' + _c).attr('src', e.target.result).show();
+						$('img.' + _c).parent().show();
+					}
+					reader.readAsDataURL(_t.files[0]);
+				}
+			});
+			
+			$("#documents_copy").on("change", function() {
+				_v = $(this).val();
+				$(".documents_hide").hide();
+				$("div." + _v).show();
+
+			});
+			
+			$("[data-event='toggle']").on("change", function() {
+				_t = $(this);
+				_n = $(this).attr("name");
+				_d = $("[name='" + _n + "']").serializeArray();
+				_c = _t.data("target");
+				if (_d.length > 0 && _t.is(':checked')) {
+					$.each(_d, function(i, fd) {
+						if (fd.value == _t.data("value")) {
+							$("." + _c).show();
+						}
+					});
+				} else {
+					$("." + _c).hide();
+				}
+			});
+			
+		});
+		
+		
+		//For showing the Map modal	
+		$("#placeGPS").on("click", function(event) {
+			event.preventDefault();
+			$("#map-location-modal").modal("show");
+			  //setTimeout(function() {
+				    mymap.invalidateSize();
+				 // }, 17)
+		});
+
+		//For canceling and hiding the Map modal
+		$("#cancel-location-btn").on("click", function(event) {
+			$("#map-location-modal").modal("hide");
+			marker = L.marker(geoLocationTemp).addTo(layerGroup);
+		});
+		
+		//For selecting the current marker and hiding the Map modal
+		$("#map-location-modal").on("click", "#submit-location-btn", function(event) {
+			event.preventDefault();
+			$("#map-location-modal").modal("hide");
+			if(geoLat != null && geoLng != null) {
+				$("#placeGPS").val(geoLat + ', ' + geoLng);
+			}
+		});
+		
+		const mymap = L.map('mapid').setView([ 27.611182149847462, 85.26531801122178 ], 17);
+		var layerGroup = L.layerGroup().addTo(mymap);
+		var marker;
+		var popup = L.popup();
+		const attribution = '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors';
+		var geoLocation;
+		var geoLocationTemp;
+		var geoLat;
+		var geoLng;
+		L.tileLayer('http://{s}.google.com/vt/lyrs=y,h&x={x}&y={y}&z={z}',{
+			attribution: 'Map data &copy; 2020 Google',
+		    maxZoom: 20,
+		    subdomains:['mt0','mt1','mt2','mt3']
+		}).addTo(mymap);
+		function onMapClick(e) {
+			layerGroup.clearLayers();
+			popup.setLatLng(e.latlng)
+				 .setContent(
+					`The selected latitude and longiude is ${e.latlng.toString()}. <a href="#" id="submit-location-btn"> Use this location </a>`
+				 ).openOn(mymap);
+			geoLocation = e.latlng;
+			geoLat = geoLocation.lat;
+			geoLng = geoLocation.lng;
+			marker = L.marker(geoLocation).addTo(layerGroup);
+		}
+
+		mymap.on('click', onMapClick);
+		
+		
+		//Transliteration portion
+		google.load("elements", "1", {
+		    packages: "transliteration"
+		});
+		
+		$(function() {
+		    var options = {
+			        sourceLanguage: 'en',
+			        destinationLanguage: ['ne'],
+			        shortcutKey: 'ctrl+g',
+			        transliterationEnabled: true
+			    };
+			var control =new google.elements.transliteration.TransliterationControl(options);
+			var uniElement = $(".unicode input[type='text'], #grid_filter input");
+			control.makeTransliteratable(uniElement);
+			control.makeTransliteratable(['placeDescription']);
+			control.makeTransliteratable(['placeName']);
+		});
+		
+		//Form validation using jQuery//
+	 	$(function() {
+			$("#placeName_error_message").hide();
+			$("#placeWard_error_message").hide();
+			$("#placeType_error_message").hide();
+			$("#placeDescription_error_message").hide();
+			$("#placeImage_error_message").hide();
+			$("#placeGPS_error_message").hide();
+			
+			let error_placeName = false;
+			let error_placeWard = false;
+			let error_placeType = false;
+			let error_placeDescription = false;
+			let error_placeImage = false;
+			let error_placeGPS = false;
+			
+			$("#placeName").focusout(function(){
+				check_placeName();
+			});
+			
+			$("#placeWard").focusout(function(){
+				check_placeWard();
+			});
+			
+			$("#placeType").focusout(function(){
+				check_placeType();
+			});
+			
+			$("#placeDescription").focusout(function(){
+				check_placeDescription();
+			});
+			
+			$("#placeImage").focusout(function(){
+				check_placeImage();
+			});
+			
+			$("#placeGPS").focusout(function(){
+				check_placeGPS();
+			});
+			
+			function check_placeName() {
+				let placeName = $("#placeName").val();
+				if(placeName !== '') {
+					$("#placeName_error_message").hide();
+					$("#placeName").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#placeName_error_message").html("Please enter the name of the place!");
+					$("#placeName_error_message").show();
+					$("#placeName").css("border-bottom", "2px solid #F90A0A");
+					error_placeName = true;
+				}
+			} 
+			
+			function check_placeWard() {
+				let placeWard = $("#placeWard").val();
+				if(placeWard !== '') {
+					$("#placeWard_error_message").hide();
+					$("#placeWard").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#placeWard_error_message").html("Please specify the ward!");
+					$("#placeWard_error_message").show();
+					$("#placeWard").css("border-bottom", "2px solid #F90A0A");
+					error_placeWard = true;
+				}
+			} 
+			
+			function check_placeType() {
+				let placeType = $("#placeType").val();
+				if(placeType !== '') {
+					$("#placeType_error_message").hide();
+					$("#placeType").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#placeType_error_message").html("Please specify the type of the place!");
+					$("#placeType_error_message").show();
+					$("#placeType").css("border-bottom", "2px solid #F90A0A");
+					error_placeType = true;
+				}
+			} 
+			
+			function check_placeDescription() {
+				let placeDecription = $("#placeDescription").val();
+				if(placeDescription !== '') {
+					$("#placeDescription_error_message").hide();
+					$("#placeDescription").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#placeDescription_error_message").html("Could you provide a short description?");
+					$("#placeDescription_error_message").show();
+					$("#placeDescription").css("border-bottom", "2px solid #F90A0A");
+					error_placeDescription = true;
+				}
+			} 
+			
+			function check_placeImage() {
+				let placeImage = $("#placeImage").val();
+				if(placeImage !== '') {
+					$("#placeImage_error_message").hide();
+					$("#placeImage").css("border", "2px solid #34F458");
+				} else {
+					$("#placeImage_error_message").html("Could you select a image to add?");
+					$("#placeImage_error_message").show();
+					$("#placeImage").css("border-bottom", "2px solid #F90A0A");
+					error_placeImage = true;
+				}
+			} 
+			
+			function check_placeGPS() {
+				let placeGPS = $("#placeGPS").val();
+				if(placeGPS !== '') {
+					$("#placeGPS_error_message").hide();
+					$("#placeGPS").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#placeGPS_error_message").html("Please specify the GPS location");
+					$("#placeGPS_error_message").show();
+					$("#placeGPS").css("border-bottom", "2px solid #F90A0A");
+					error_placeGPS = true;
+				}
+			} 
+			
+		$(function() {
+			$("#add-favourite-btn").click(function(event) {
+				
+			var timestamp = new Date().getTime() + Math.floor(Math.random()*(999-100+1)+100);
+				
+			event.preventDefault();
+				
+			error_placeName = false;
+			error_placeWard = false;
+			error_placeType = false;
+			error_placeDescription = false;
+			error_placeImage = false;
+			error_placeGPS = false;
+				
+				
+			check_placeName();
+			check_placeWard();
+			check_placeType();
+			check_placeDescription();
+			check_placeImage();
+			check_placeGPS();
+				
+			if(error_placeName === false && error_placeWard === false && error_placeType === false &&
+				 error_placeDescription === false && error_placeImage === false && error_placeGPS === false) {
+					
+					//Getting the data from the form	
+					let placeName = $("#placeName").val();
+					let placeWard = $("#placeWard").val();
+					let placeType = $("#placeType").val();
+					let placeDescription = $("#placeDescription").val();
+					let placeGPS = $("#placeGPS").val();
+					
+					let favPlaceInfo = {};
+					favPlaceInfo.placeName = placeName;
+					favPlaceInfo.placeWard = placeWard;
+					favPlaceInfo.placeType = placeType;
+					favPlaceInfo.placeDescription = placeDescription;
+					favPlaceInfo.placeGPS = placeGPS;
+					favPlaceInfo.filledId = timestamp;
+					
+					
+					let file = $("#placeImage")[0].files[0];
+					let fileName = file.name;
+					let fileSize = file.size;
+					let fileExtension = fileName.split('.').pop();
+					
+					let placeImageName = "JPEG_place_" + timestamp + "." + fileExtension; 
+					
+					favPlaceInfo.placeImage = placeImageName;
+					
+					let form = document.getElementById("favPlaceImg");
+				
+					let formData = new FormData(form);
+					
+					formData.append("imgIndex", "placeImage");
+					formData.append("fileName", placeImageName);
+					formData.append("filledId", timestamp);
+
+					
+					// Now create an ajax request to send fav place details to the server
+					$.ajax({
+						method : "POST",
+						url : contextPath + "/favourite-place",
+						data : JSON.stringify(favPlaceInfo),
+						contentType : "application/json",
+						processData: false,
+						success : function(result) {
+							swal.fire({
+								text: "Favourite place added successfully!",
+								icon: "success",
+								closeOnClickOutside: true,
+								closeOnEsc: true
+							})
+							.then(function() {
+								window.location.href = contextPath + '/favourite-place';
+							});
+						},
+						error : function(error) {
+							swal.fire({
+								text: error.responseJSON.message,
+								icon: "error",
+								closeOnClickOutside: false,
+								closeOnEsc: false
+							})
+							.then(function() {
+								window.location.href = contextPath;
+							});
+						}
+					});
+					
+					$.ajax({
+						method: "POST",
+						url : contextPath + "/favourite-place/image",
+						data: formData,
+						async: false,
+						contentType: false,
+						processData: false,
+						success: function(result) {
+							swal.fire(
+								{
+									text : "The place has been added",
+									icon : "success",
+									closeOnClickOutside : false,
+									closeOnEsc : false
+							}).then(function() {
+								window.location.href =  contextPath + '/favourite-place';
+							});
+						}
+						
+					});
+				} else {
+					swal.fire({
+		            	icon: "info",
+		            	text: "Please enter the required fields correctly :(",
+		        	});
+				}
+				
+
+			}) 
+		});
+	});
+		
+	</script>
+</body>
+</html>

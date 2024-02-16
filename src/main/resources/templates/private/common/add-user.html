@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+<title>दक्षिणकाली नगरपालिका</title>
+<!-- fav icon-->
+<link rel="icon" th:href="@{/assets/images/favicon1.ico}"
+	href="assets/images/favicon1.ico" type="image/x-icon" />
+<link th:href="@{/assets/plugins/vectormap/jquery-jvectormap-2.0.2.css}"
+	href="assets/plugins/vectormap/jquery-jvectormap-2.0.2.css"
+	rel="stylesheet" />
+<link th:href="@{/assets/plugins/simplebar/css/simplebar.css}"
+	href="/assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+<link th:href="@{/assets/css/bootstrap.min.css}"
+	href="/assets/css/bootstrap.min.css" rel="stylesheet" />
+<link th:href="@{/assets/css/animate.css}"
+	href="/assets/css/animate.css" rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/icons.css}" href="assets/css/icons.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/sidebar-menu.css}"
+	href="assets/css/sidebar-menu.css" rel="stylesheet" />
+<link th:href="@{/assets/css/app-style.css}"
+	href="assets/css/app-style.css" rel="stylesheet" />
+
+</head>
+<body>
+	<div id="wrapper">
+		<!--Side bar and header -->
+		<div th:replace="~{fragments/private-sidebar :: private-sidebar}"></div>
+		<header th:replace="~{fragments/header :: header}" class="header1">
+		</header>
+
+
+		<div class="clearfix"></div>
+		<div class="content-wrapper">
+			<div class="container-fluid" id="pjax-container">
+				<div class="row pt-2 pb-2">
+					<div class="col-sm-9">
+						<h4 class="page-title">नगरबासी बिवरण कम्प्युटर प्रणाली</h4>
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="javaScript:void();">गृह</a></li>
+							<li class="breadcrumb-item active" aria-current="page">प्रयोगकर्ता
+								बिवरण परिवर्तन</li>
+						</ol>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-body">
+						<div class="card-title">नया खाता बनाउने फारम</div>
+						<form id="user-add-form">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="input-1">पुरा नाम (नाम को बिचमा खाली ठाउँ
+										राख्नुहोस)</label> <input id="name" type="text" class="form-control "
+										name="name" required autocomplete="name" autofocus
+										placeholder="Enter Your Name">
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="username">युसर नाम</label> <input id="username"
+										type="text" class="form-control " name="username" required
+										placeholder="Enter your username">
+										<span id="username_check"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="password">पासवोर्ड</label> <input id="password"
+										type="password" class="form-control " name="password" required
+										placeholder="Enter your password">
+										<span id="password_strength"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="email">इमेल</label> <input id="email" type="email"
+										class="form-control " name="email" required
+										placeholder="Enter Your Email Address">
+									<span id="email_check"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="mobile">मोबाईल नम्बर</label> <input id="mobile"
+										type="text" class="form-control " name="mobile"
+										placeholder="Enter Your Mobile Number" required
+										title="Mobile number should be of 10 digits" pattern="[1-9]{1}[0-9]{9}">
+									<span id="mobile_check"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="account-type">खाताको प्रकार</label> <select
+										id="account-type">
+										<option th:value="${role.id}" th:each="role: ${roles}"
+											th:text="${role.roleNepali}">केन्द्रिय एडमिन</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="ward-no">वडा नम्बर</label> <select id="ward-no">
+										<option th:value="${wardNo}" th:each="wardNo: ${wards}"
+											th:text="${wardNo}" )>1</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<button type="submit" class="btn btn-primary px-5">
+									<i class="icon-lock"></i>  युसर बनाउनुहोस
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a href="javaScript:void();" class="back-to-top"><i
+			class="fa fa-angle-double-up"></i> </a>
+		<footer th:replace="~{fragments/footer :: footer}"></footer>
+	</div>
+	<div th:replace="~{fragments/scripts :: scripts}"></div>
+	<script>
+			$(function () {
+	    	    var token = $("meta[name='_csrf']").attr("content");
+	    	    var header = $("meta[name='_csrf_header']").attr("content");
+	    	    $(document).ajaxSend(function(e, xhr, options) {
+	    	        xhr.setRequestHeader(header, token);
+	    	    });
+	    	});
+			
+			
+			$(function() {
+				let validPassword = false;
+				let validUsername = false;
+				let validEmail = false;
+				let validMobileNumber = false;
+				
+				// function to check strength of password.
+				$("#password").bind("keyup", function () {
+		            //TextBox left blank.
+		            if ($(this).val().length == 0) {
+		                $("#password_strength").html("");
+		                return;
+		            }
+		 
+		            //Regular Expressions.
+		            var regex = new Array();
+		            regex.push("[A-Z]"); //Uppercase Alphabet.
+		            regex.push("[a-z]"); //Lowercase Alphabet.
+		            regex.push("[0-9]"); //Digit.
+		            regex.push("[$@$!%*#?&]"); //Special Character.
+		 
+		            var passed = 0;
+		 
+		            //Validate for each Regular Expression.
+		            for (var i = 0; i < regex.length; i++) {
+		                if (new RegExp(regex[i]).test($(this).val())) {
+		                    passed++;
+		                }
+		            }
+		 
+		 
+		            //Validate for length of Password.
+		            if (passed > 2 && $(this).val().length > 8) {
+		                passed++;
+		            }
+		 
+		            //Display status.
+		            var color = "";
+		            var strength = "";
+		            switch (passed) {
+		                case 0:
+		                case 1:
+		                    strength = "Weak";
+		                    color = "red";
+		                    validPassword = false;
+		                    break;
+		                case 2:
+		                    strength = "Good";
+		                    color = "darkorange";
+		                    validPassword = false;
+		                    break;
+		                case 3:
+		                case 4:
+		                    strength = "Strong";
+		                    color = "green";
+		                    validPassword = true;
+		                    break;
+		                case 5:
+		                    strength = "Very Strong";
+		                    color = "darkgreen";
+		                    validPassword = true;
+		                    break;
+		            }
+		            $("#password_strength").html(strength);
+		            $("#password_strength").css("color", color);
+		        });
+				
+				// Checks the duplicate username 
+				$("#username").on("focusout", function(event) {
+					let user = $(this).val().trim();
+					let username = {
+						"username" : user
+					};
+					
+					$.ajax({
+						url : contextPath + "/user/duplicate", //contextPath variable is initialized in footer.html
+						method : "POST",
+						contentType: "Application/Json",
+						data: JSON.stringify(username),
+					}).done(function(data) {
+						let status = JSON.stringify(data);
+						if(status.indexOf("true") > 0) {
+							$("#username_check").text("This username already exists!").css("color", "red");
+						} else {
+							validUsername = true;
+							$("#username_check").text("Valid username.").css("color", "green");
+						}
+						
+					}).fail(function(data) {
+						swal.fire({
+							icon : "error",
+							text : "Something went wrong!"
+						}).then((btnClick) => {
+							if(btnClick.value) {
+								location.reload(true);	
+							}
+						});
+					});
+				});
+				
+				
+				// check duplicate mobile number
+				$("#mobile").on("focusout", function(event) {
+					let mobile = $(this).val().trim();
+					let mobileNumber = {
+						"mobile_number" : mobile
+					};
+					
+					$.ajax({
+						url : contextPath + "/user/duplicate", //contextPath variable is initialized in footer.html
+						method : "POST",
+						contentType: "Application/Json",
+						data: JSON.stringify(mobileNumber),
+					}).done(function(data) {
+						let status = JSON.stringify(data);
+						if(status.indexOf("true") > 0) {
+							$("#mobile_check").text("This mobile number already exists!").css("color", "red");
+						} else {
+							validMobileNumber = true;
+							$("#mobile_check").text("Valid mobile number.").css("color", "green");
+						}
+						
+					}).fail(function(data) {
+						swal.fire({
+							icon : "error",
+							text : "Something went wrong!"
+						}).then((btnClick) => {
+							if(btnClick.value) {
+								location.reload(true);	
+							}
+						});
+					});
+				});
+				
+				
+				
+				// check duplicate email address
+				$("#email").on("focusout", function(event) {
+					let email = $(this).val().trim();
+					let emailAddress = {
+						"email" : email
+					};
+					
+					$.ajax({
+						url : contextPath + "/user/duplicate", //contextPath variable is initialized in footer.html
+						method : "POST",
+						contentType: "Application/Json",
+						data: JSON.stringify(emailAddress),
+					}).done(function(data) {
+						let status = JSON.stringify(data);
+						if(status.indexOf("true") > 0) {
+							$("#email_check").text("This email already exists!").css("color", "red");
+						} else {
+							validEmail = true;
+							$("#email_check").text("Valid email.").css("color", "green");
+						}
+					}).fail(function(data) {
+						swal.fire({
+							icon : "error",
+							text : "Something went wrong!"
+						}).then((btnClick) => {
+							if(btnClick.value) {
+								location.reload(true);	
+							}
+						});
+					});
+				});
+				
+				 $("#user-add-form").on("submit", function(event) {
+					event.preventDefault();
+					let email = $("#email").val();
+					let username = $("#username").val();
+					let password = $("#password").val();
+					
+					if(!validPassword) {
+						swal.fire({
+							title: "Please Type Better Password.",
+							icon : "error",
+							text : "Password should contain combination of special characters, numbers and alphabets."
+						});
+						return;
+					}
+					
+					if(!validUsername) {
+						return;
+					}
+					
+					if(!validMobileNumber) {
+						return;
+					}
+					
+					if(!validEmail) {
+						return;
+					}
+					
+					let mobileNumber = $("#mobile").val();
+					let fullName = $("#name").val();
+					let accountType = $("#account-type").val();
+					let wardNo = $("#ward-no").val();
+					let userInfo = {
+						"email": email,
+						"username": username,
+						"password": password,
+						"mobileNumber": mobileNumber,
+						"fullName": fullName,
+						"accountType": accountType,
+						"wardNo": wardNo
+					};
+					
+					swal.fire({
+						title : 'Are you sure you want to add this user?',
+						text : "You won't be able to revert this!",
+						icon : 'warning',
+						showCancelButton : true,
+						confirmButtonColor : '#3085d6',
+						cancelButtonColor : '#d33',
+						confirmButtonText : 'Yes, add it!'
+					}).then((btnClicked) => {
+						if(btnClicked.value) {
+							$.ajax({
+								url : contextPath + "/user", //contextPath variable is initialized in footer.html
+								method : "POST",
+								contentType: "application/json",
+								data: JSON.stringify(userInfo),
+							}).done(function(data) {
+								swal.fire({
+    								icon : "success",
+    								text : data.data
+    							}).then((btnClick) => {
+    								if(btnClick.value) {
+    									location.reload(true);		
+    								}
+    							});
+							}).fail(function(data) {
+								swal.fire({
+    								icon : "error",
+    								text : data.data
+    							}).then((btnClick) => {
+    								if(btnClick.value) {
+    									location.reload(true);		
+    								}
+    							});
+							});
+						}
+					});
+				});
+			});
+		</script>
+</body>
+</html>

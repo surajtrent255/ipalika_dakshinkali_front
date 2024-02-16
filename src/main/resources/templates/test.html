@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <table id="example_table" style="display: block">
+      <tbody>
+        <tr>
+          <td colspan="5"></td>
+        </tr>
+        <tr>
+          <td colspan="2"></td>
+          <th>दक्षिणकाली नगरपालिका</th>
+        </tr>
+        <tr>
+          <td colspan="2"></td>
+          <th>नगर कार्यपालिकाको कार्यालय</th>
+        </tr>
+        <tr>
+          <td colspan="2"></td>
+          <th>फर्पिंङ, काठमाडौं, बागमती प्रदेश, नेपाल</th>
+        </tr>
+        <tr>
+          <td colspan="5"></td>
+        </tr>
+        <tr>
+          <td colspan="5"></td>
+        </tr>
+        <tr>
+          <td colspan="5"></td>
+          <!-- <td>वडा नं. <span id="wardForExcel"></span>  को संक्षिप्त प्रतिवेदन</td> -->
+        </tr>
+        <tr>
+          <td colspan="5"></td>
+        </tr>
+      </tbody>
+    </table>
+    <button id="downloadexcel" onclick="fnExcelReport()">Table To Excel</button>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.1.1/exceljs.min.js
+"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js
+"></script>
+    <script>
+      function fnExcelReport() {
+        var workbook = new ExcelJS.Workbook();
+        var worksheet = workbook.addWorksheet("Sheet1");
+
+        // Populate data
+        var table = document.getElementById("example_table");
+        for (var i = 0; i < table.rows.length; i++) {
+          var row = table.rows[i];
+          var rowValues = [];
+          for (var j = 0; j < row.cells.length; j++) {
+            rowValues.push(row.cells[j].innerText);
+          }
+          worksheet.addRow(rowValues);
+        }
+
+        // Apply styles (example: set background color for cell A1)
+        const cellReferences = [
+          "C2",
+          "C3",
+          "C4",
+          "D2",
+          "D3",
+          "D4",
+          "B2",
+          "B3",
+          "B4",
+        ];
+        cellReferences.forEach((cellRef) => {
+          worksheet.getCell(cellRef).font = { bold: true };
+
+          worksheet.getCell(cellRef).fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFF000" },
+          };
+
+          worksheet.getCell(cellRef).font = {
+            color: { argb: "FF0000" }, // Red text color
+          };
+        });
+
+        // Generate the Excel file
+        workbook.xlsx.writeBuffer().then(function (buffer) {
+          var blob = new Blob([buffer], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          });
+          saveAs(blob, "Report.xlsx");
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,585 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+<title>दक्षिणकाली नगरपालिका</title>
+<link rel="icon" th:href="@{/assets/images/favicon1.ico}"
+	href="assets/images/favicon1.ico" type="image/x-icon" />
+<link th:href="@{/assets/plugins/vectormap/jquery-jvectormap-2.0.2.css}"
+	href="assets/plugins/vectormap/jquery-jvectormap-2.0.2.css"
+	rel="stylesheet" />
+<link th:href="@{/assets/plugins/simplebar/css/simplebar.css}"
+	href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+<link th:href="@{/assets/css/bootstrap.min.css}"
+	href="assets/css/bootstrap.min.css" rel="stylesheet" />
+<link th:href="@{/assets/css/animate.css}" href="assets/css/animate.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/icons.css}" href="assets/css/icons.css"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/assets/css/sidebar-menu.css}"
+	href="assets/css/sidebar-menu.css" rel="stylesheet" />
+
+<link th:href="@{/assets/css/app-style.css}"
+	href="assets/css/app-style.css" rel="stylesheet" />
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/datatable/datatables.min.css}"
+	href="assets/plugins/datatable/datatables.min.css">
+<link rel="stylesheet"
+	th:href="@{/assets/plugins/jquery.steps/css/jquery.steps.css}"
+	href="assets/plugins/jquery.steps/css/jquery.steps.css">
+<link rel="stylesheet" th:href="@{/assets/css/leaflet.css}"/>
+
+
+<style>
+.form-group {
+	width: 100%;
+}
+
+.wizard>.content {
+	background: #fff;
+	min-height: 430px;
+	margin: 0;
+}
+
+.wizard>.content>.body {
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.member-panel .padding, .member-panel-submit .padding {
+	padding: 10px;
+}
+
+.wizard>.content>.body label.error {
+	margin-left: 0;
+}
+
+.error_form {
+	top: 12px;
+	color: rgb(216, 15, 15);
+	font-size: 15px;
+	font-family: Helvetica;
+}
+
+.btn-circle {
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 12px;
+  line-height: 1.42;
+  border-radius: 15px;
+}
+</style>
+</head>
+<body>
+	<div id="wrapper">
+		<!-- Side bar and header -->
+		<div th:replace="~{fragments/private-sidebar :: private-sidebar}"></div>
+		<header th:replace="~{fragments/header :: header}" class="header1"> </header>
+		<div class="clearfix"></div>
+		<div class="content-wrapper">
+			<div class="container-fluid" id="pjax-container">
+				<div class="row pt-2 pb-2">
+					<div class="col-sm-9">
+						<h4 class="page-title">Data Management System</h4>
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="javaScript:void();">Home</a></li>
+							<li class="breadcrumb-item active" aria-current="page">Edit
+								Ward</li>
+						</ol>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-body">
+						<div class="card-title">Edit the information about the ward.</div>
+						<!-- <form name="wardEditForm" id="wardEditForm" method="POST"
+							th:action="@{/ward}"	enctype="multipart/form-data" class="unicode"> -->
+							<div class="form-group row">
+								<div class="col-md-4" sec:authorize="hasAnyRole('CENTRAL_ADMIN')">
+									<label for="wardNumber">Ward Number</label> <input type="text"
+										id="wardNumber" name="wardNumber" class="form-control required" th:value="${wardInfo.wardNumber}"/>
+										<span class="error_form" id="wardNumber_error_message"></span>
+								</div>
+								<div class="col-md-4" sec:authorize="hasAnyRole('WARD_ADMIN')">
+									<label for="wardNumber">Ward Number</label> <input type="text"
+										id="wardNumber" name="wardNumber" class="form-control required" th:value="${wardInfo.wardNumber}" readonly/>
+										<span class="error_form" id="wardNumber_error_message"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="wardName">Name</label> 
+										<input type="text" id="wardName" name="wardName" class="form-control required" th:value="${wardInfo.wardName}"/>
+									<span class="error_form" id="wardName_error_message"></span>										
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="wardLocation">Location</label> 
+										<input type="text" id="wardLocation" name="wardLocation" class="form-control required" th:value="${wardInfo.wardLocation}"/>
+									<span class="error_form" id="wardLocation_error_message"></span>										
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="wardDescription">Ward Description</label>
+									<textarea name="wardDescription" id="wardDescription"  rows="10"
+										class="form-control required" th:value="${wardInfo.wardDescription}">
+									</textarea>
+									<span class="error_form" id="wardDescription_error_message"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4" id="wardmembers">
+									<label for="mainPerson">Ward Members</label> 
+										<div class="" style="display: flex; ">
+										<input type="text" id="mainPerson1" name="mainPerson1" data-val="1" class="form-control required col-md-12" th:value="${wardInfo.mainPerson.split(',')[0]}"/>
+										<button class="btn-circle" style="margin-left:10px; padding:10px" id="addWardMembBtn"> + </button>
+										<button class="btn-circle" style="margin-left:10px; padding:10px" id="removeWardMembBtn"> - </button>
+										</div>
+									<span class="error_form" id="mainPerson_error_message"></span>
+									
+									<div th:each="item, indx : ${wardInfo.mainPerson.split(',')}" th:if="${indx.index} != 0">
+									<input type="text" th:id="'mainPerson' + ${indx.index + 1}" th:name="'mainPerson' + ${indx.index + 1}" th:data-val="${indx.index + 1}" class="form-control required col-md-12" th:value="${item}"/>
+										</div>										
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="contactNumber">Contact Number</label> 
+										<input type="text" id="contactNumber" name="contactNumber" class="form-control required" th:value="${wardInfo.contactNumber}"/>
+									<span class="error_form" id="contactNumber_error_message"></span>										
+								</div>
+							</div>
+							
+							
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label for="buildingImg">Ward Building Photo</label>
+									<form th:id="wardBuildingImg" th:name="wardBuildingImg" enctype="multipart/form-data" useToken="true"> 
+										<input type="file" id="buildingImg" name="buildingImg" class="form-control" value="" data-event="change"
+										data-target="placeImgDisplay" accept="image/*" />
+										 <a href=""
+										style="display: block" target="_blank" class="no-pjax"> <img
+										src="" style="display: block; height: 150px; width: 300px" th:class="placeImgDisplay" class="img-thumbnail photo" th:onerror="'this.src=\'' + @{/assets/images/no-image.png} + '\';'" th:src="${wardInfo.buildingImage}"></a>
+										</form>
+									<span class="error_form" id="buildingPhoto_error_message"></span>										
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<button id="update-ward-btn" class="btn btn-primary px-5">
+									<i class="icon-lock"></i>  Update Ward
+								</button>
+							</div>
+						<!-- </form> -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<a href="javaScript:void();" class="back-to-top"><i
+			class="fa fa-angle-double-up"></i> </a>
+		<footer th:replace="~{fragments/footer :: footer}"></footer> 
+	</div>
+	<div th:replace="~{fragments/scripts :: scripts}">
+	</div>
+	<!-- 	<!--Start footer-->
+	<script th:src="@{/assets/js/leaflet.js}"></script>
+	<script th:inline="javascript">
+	/*<![CDATA[*/
+	var wardNum = /*[[${wardInfo.wardNumber}]]*/ '0';
+	var wardInfoInitial = /*[[${wardInfo}]]*/;
+	/*]]>*/
+	
+	
+	let memberInputElements = [];
+	//console.log("splitted--->", wardInfoInitial.mainPerson.split(','))
+	wardInfoInitial.mainPerson.split(',').forEach((item, index)=>{
+		const extId = `#mainPerson${index + 1}`;
+		if(item != '')
+		memberInputElements.push($(extId)[0]);
+	})
+	//memberInputElements.push($("#mainPerson1")[0]);
+	console.log('Member Input Elements--->' , memberInputElements)
+	
+	
+		$(function () {
+		    var token = $("meta[name='_csrf']").attr("content");
+		    var header = $("meta[name='_csrf_header']").attr("content");
+		    $(document).ajaxSend(function(e, xhr, options) {
+		        xhr.setRequestHeader(header, token);
+		    });
+		});	
+	
+	//For displaying the selected image for uploading
+	$(function() {
+		var _t, _n, _d, _v;
+		$("input[data-event='change']").on("change", function() {
+			_t = this;
+			_c = $(this).data("target");
+			if (_t.files && _t.files[0]) {
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					$('img.' + _c).attr('src', e.target.result).show();
+					$('img.' + _c).parent().show();
+				}
+				reader.readAsDataURL(_t.files[0]);
+			}
+		});
+		
+		$("#documents_copy").on("change", function() {
+			_v = $(this).val();
+			$(".documents_hide").hide();
+			$("div." + _v).show();
+
+		});
+		
+		$("[data-event='toggle']").on("change", function() {
+			_t = $(this);
+			_n = $(this).attr("name");
+			_d = $("[name='" + _n + "']").serializeArray();
+			_c = _t.data("target");
+			if (_d.length > 0 && _t.is(':checked')) {
+				$.each(_d, function(i, fd) {
+					if (fd.value == _t.data("value")) {
+						$("." + _c).show();
+					}
+				});
+			} else {
+				$("." + _c).hide();
+			}
+		});
+		
+	});
+	
+	//For displaying the selected image for uploading ends
+	
+	
+		$(window).on("load", function(e) {
+			evaluateAnswers();
+		})
+		
+		function evaluateAnswers() {
+			$("#wardDescription").val(wardInfoInitial.wardDescription);
+		}
+		
+		function goBack() {
+			window.history.back();
+		}
+		//Transliteration portion
+		google.load("elements", "1", {
+		    packages: "transliteration"
+		});
+		
+		$(function() {
+		    var options = {
+			        sourceLanguage: 'en',
+			        destinationLanguage: ['ne'],
+			        shortcutKey: 'ctrl+g',
+			        transliterationEnabled: true
+			    };
+			var control =new google.elements.transliteration.TransliterationControl(options);
+			var uniElement = $(".unicode input[type='text'], #grid_filter input");
+			control.makeTransliteratable(uniElement);
+			control.makeTransliteratable(['wardDescription']);
+		});
+		
+		//Form validation using jQuery//
+	 	$(function() {
+			$("#wardNumber_error_message").hide();
+			$("#wardName_error_message").hide();
+			$("#wardLocation_error_message").hide();
+			$("#wardDescription_error_message").hide();
+			$("#mainPerson_error_message").hide();
+			$("#contactNumber_error_message").hide();
+			
+			let error_wardNumber = false;
+			let error_wardName = false;
+			let error_wardLocation = false;
+			let error_wardDescription = false;
+			let error_mainPerson = false;
+			let error_contactNumber = false;
+			
+			$("#wardNumber").focusout(function(){
+				check_wardNumber();
+			});
+			
+			$("#wardName").focusout(function(){
+				check_wardName();
+			});
+			
+			$("#wardLocation").focusout(function(){
+				check_wardLocation();
+			});
+			
+			$("#wardDescription").focusout(function(){
+				check_wardDescription();
+			});
+			
+			$("#mainPerson1").focusout(function(){
+				check_mainPerson();
+			});
+			
+			$("#contactNumber").focusout(function(){
+				check_contactNumber();
+			});
+
+			
+			function check_wardNumber() {
+				let wardNumber = $("#wardNumber").val();
+				if(wardNumber !== '') {
+					$("#wardNumber_error_message").hide();
+					$("#wardNumber").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#wardNumber_error_message").html("Please enter ward Number!");
+					$("#wardNumber_error_message").show();
+					$("#wardNumber").css("border-bottom", "2px solid #F90A0A");
+					error_wardNumber = true;
+				}
+			} 
+			
+			function check_wardName() {
+				let wardName = $("#wardName").val();
+				if(wardName !== '') {
+					$("#wardName_error_message").hide();
+					$("#wardName").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#wardName_error_message").html("Please specify the name!");
+					$("#wardName_error_message").show();
+					$("#wardName").css("border-bottom", "2px solid #F90A0A");
+					error_wardName = true;
+				}
+			} 
+			
+			function check_wardLocation() {
+				let wardLocation = $("#wardLocation").val();
+				if(wardLocation !== '') {
+					$("#wardLocation_error_message").hide();
+					$("#wardLocation").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#wardLocation_error_message").html("Please specify the location!");
+					$("#wardLocation_error_message").show();
+					$("#wardLocation").css("border-bottom", "2px solid #F90A0A");
+					error_wardLocation = true;
+				}
+			} 
+			
+			function check_wardDescription() {
+				let wardDecription = $("#wardDescription").val();
+				if(wardDescription !== '') {
+					$("#wardDescription_error_message").hide();
+					$("#wardDescription").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#wardDescription_error_message").html("Could you provide a short description?");
+					$("#wardDescription_error_message").show();
+					$("#wardDescription").css("border-bottom", "2px solid #F90A0A");
+					error_wardDescription = true;
+				}
+			} 
+			
+			function check_mainPerson() {
+				let mainPerson = $("#mainPerson1").val();
+				if(mainPerson !== '') {
+					$("#mainPerson_error_message").hide();
+					$("#mainPerson1").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#mainPerson_error_message").html("Could you provide name of main person?");
+					$("#mainPerson_error_message").show();
+					$("#mainPerson1").css("border-bottom", "2px solid #F90A0A");
+					error_mainPerson = true;
+				}
+			} 
+			
+			function check_contactNumber() {
+				let contactNumber = $("#contactNumber").val();
+				if(contactNumber !== '') {
+					$("#contactNumber_error_message").hide();
+					$("#contactNumber").css("border-bottom", "2px solid #34F458");
+				} else {
+					$("#contactNumber_error_message").html("Please provide a contact number!");
+					$("#contactNumber_error_message").show();
+					$("#contactNumber").css("border-bottom", "2px solid #F90A0A");
+					error_contactNumber = true;
+				}
+			} 
+			
+			
+		$(function() {
+			$("#update-ward-btn").click(function(event) {
+				
+				var timestamp = new Date().getTime() + Math.floor(Math.random()*(999-100+1)+100);
+				
+			event.preventDefault();
+				
+			error_wardNumber = false;
+			error_wardName = false;
+			error_wardLocation = false;
+			error_wardDescription = false;
+			error_mainPerson = false;
+			error_contactNumber = false;
+				
+				
+			check_wardNumber();
+			check_wardName();
+			check_wardLocation();
+			check_wardDescription();
+			check_mainPerson();
+			check_contactNumber();
+				
+			if(error_wardNumber === false && error_wardName === false && error_wardLocation === false &&
+				 error_wardDescription === false && error_mainPerson === false && error_contactNumber === false) {
+					
+					//Getting the data from the form	
+					let wardNumber = $("#wardNumber").val();
+					let wardName = $("#wardName").val();
+					let wardLocation = $("#wardLocation").val();
+					let wardDescription = $("#wardDescription").val();
+					let mainPerson = $("#mainPerson1").val();
+					let contactNumber = $("#contactNumber").val();
+					
+					let finalPersonList = '';
+					memberInputElements.forEach((elem, index)=>{
+						console.log(elem);
+						let dynVarName = `#mainPerson${index + 1}`;
+						console.log('Dyn Var Name--->', dynVarName)
+						const strngz = $(dynVarName).val();
+						console.log('Strngz' , strngz);
+						
+						if(strngz != '')
+						finalPersonList = finalPersonList + strngz + ',';
+						
+					})
+					
+					console.log("finalPersonList", finalPersonList)
+					
+					let wardInfo = {};
+					wardInfo.wardNumber = wardNumber;
+					wardInfo.wardName = wardName;
+					wardInfo.wardLocation = wardLocation;
+					wardInfo.wardDescription = wardDescription;
+					wardInfo.mainPerson = finalPersonList;
+					wardInfo.contactNumber = contactNumber;
+					wardInfo.buildingImage = wardInfoInitial.buildingImage.substring(wardInfoInitial.buildingImage.indexOf("JPEG"));
+					
+					let file = $("#buildingImg")[0].files[0];
+					let formData;
+					if(file != null){
+					let fileName = file.name;
+					let fileSize = file.size;
+					let fileExtension = fileName.split('.').pop();
+					
+					let buildingImageName = "JPEG_ward_" + timestamp + "." + fileExtension; 
+					
+					wardInfo.buildingImage = buildingImageName;
+					
+					let form = document.getElementById("wardBuildingImg");
+				
+					formData = new FormData(form);
+					
+					formData.append("imgIndex", "buildingImg");
+					formData.append("fileName", buildingImageName);
+					formData.append("filledId", timestamp);
+					}
+					
+					// Now create an ajax request to send member details to the server
+					$.ajax({
+						method : "PUT",
+						url : contextPath + "/ward/" + wardNum,
+						data : JSON.stringify(wardInfo),
+						contentType : "Application/Json",
+						success : function(result) {
+							swal.fire(
+								{
+									text : result.data,
+									icon : "success",
+									closeOnClickOutside : false,
+									closeOnEsc : false
+								}).then(function() {
+									goBack();
+								});
+						},
+						error : function(error) {
+						}
+					});
+					
+					
+					if(file != null){
+						$.ajax({
+							method: "POST",
+							url : contextPath + "/ward/image",
+							data: formData,
+							async: false,
+							contentType: false,
+							processData: false,
+							success: function(result) {
+								swal.fire(
+									{
+										text : "The ward has been added",
+										icon : "success",
+										closeOnClickOutside : false,
+										closeOnEsc : false
+								}).then(function() {
+									window.location.href =  contextPath + '/ward/';
+								});
+							}
+							
+						});}
+				} else {
+					swal.fire({
+		            	icon: "info",
+		            	text: "Please enter the required fields correctly :(",
+		        	});
+				}
+			}) 
+		});
+	});
+		
+	$("#addWardMembBtn").click(function(event) {
+		event.preventDefault();
+		console.log("AddMembbbBB")
+		//chefck
+		const lastInp = $("#wardmembers").find("input:last");
+		console.log('last Input-->', lastInp);
+		//chfck ends
+		const lastInpInd = $("#wardmembers").find("input:last").data("val");
+		const html = `<input type="text" id="mainPerson${+lastInpInd + 1}" data-val="${+lastInpInd + 1}" name="mainPerson${+lastInpInd + 1}" class="form-control required""/>`;
+		$("#wardmembers").append(html);
+		
+		const idx = `#mainPerson${+lastInpInd + 1}`;
+		memberInputElements.push($(idx)[0]);
+		console.log('Member Input Elements--->' , memberInputElements)
+		
+		
+	})
+	
+	$("#removeWardMembBtn").click(function(event) {
+		event.preventDefault();
+		console.log("RemoveMembbbBB")
+		
+		const lastInp = $("#wardmembers").find("input:last");
+		console.log('last Input-->', lastInp);
+		
+		const valz = lastInp.data("val");
+	
+		console.log("valz-->", valz);
+		const idz = `#mainPerson${valz}`;
+		if(valz > 1)
+		$(idz).remove();
+		//$("#wardmembers").remove(lastInp);
+		
+		memberInputElements.pop();
+		console.log('Member Input Elements--->' , memberInputElements)
+		
+	})
+	</script>
+</body>
+</html>
